@@ -16,6 +16,7 @@ const runTraining = async (character, options) => {
   const continueTraining = await confirmAction(
     'Do you want to venture deeper into the woods?',
   );
+  console.clear();
   if (!continueTraining) {
     character.stage = characterStages.idle;
   }

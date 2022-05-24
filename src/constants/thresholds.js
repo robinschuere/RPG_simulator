@@ -50,5 +50,5 @@ module.exports = {
       DEX: 5,
       SPD: 5,
     },
-  }
-}
+  },
+};

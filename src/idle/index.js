@@ -32,8 +32,13 @@ const runIdle = async (character, stop, { doNotCleanConsole = false }) => {
     },
     {
       key: '2',
+      value: 'check gear',
+      action: () => getCharacterCard(character, false, true, false),
+    },
+    {
+      key: '3',
       value: 'check items',
-      action: () => getCharacterCard(character, false, true, true),
+      action: () => getCharacterCard(character, false, false, true),
     },
     { key: 'S', value: 'Save', action: () => saveCharacter(character) },
     { key: 'Q', value: 'Quit', action: () => quit(character) },

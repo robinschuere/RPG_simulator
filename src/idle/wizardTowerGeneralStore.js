@@ -1,18 +1,6 @@
 const { getItem } = require('../helpers/itemHelpers');
 const { sellInventoryItem } = require('../helpers/inventoryHelpers');
 const { optionAction, confirmAction } = require('../helpers/promptActions');
-const { hasCompletedQuest } = require('../helpers/questHelpers');
-const { npcMessage } = require('../helpers/messages');
-
-const openStore = (character) => {
-  if (!hasCompletedQuest(character, 'aFirstEncounter')) {
-    npcMessage(
-      'Trader',
-      `I'm terribly sorry. I cannot sell you anything at this moment.`,
-    );
-    return;
-  }
-};
 
 const sellItems = async (character) => {
   let selling = true;
@@ -70,16 +58,11 @@ const idle = {
   options: [
     {
       key: 'A',
-      value: 'Check wares',
-      action: openStore,
-    },
-    {
-      key: 'B',
       value: 'Sell items',
       action: sellItems,
     },
     {
-      key: 'C',
+      key: 'B',
       value: 'Return to the main hall',
       action: (character) => (character.location = 'wizardTower'),
     },

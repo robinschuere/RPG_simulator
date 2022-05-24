@@ -12,25 +12,20 @@ const {
 } = require('../helpers/messages');
 const staller = require('../helpers/staller');
 
-const attainAttackerAndDefender = (character, enemy) => {
+const defineFirstRound = (character, enemy) => {
   if (character.SPD === enemy.SPD) {
     const randomizer = Math.floor(Math.random() * 100);
-    if (randomizer <= 50) {
-      return {
-        att: character,
-        def: enemy,
-        characterAttack: true,
-      };
-    }
     return {
-      att: enemy,
-      def: character,
-      characterAttack: false,
+      attacker: randomizer <= 50 ? character : enemy,
+      defender: randomizer <= 50 ? enemy : character,
+      characterAttack: randomizer <= 50,
     };
   }
-  return character.SPD > enemy.SPD
-    ? { att: character, def: enemy, characterAttack: true }
-    : { att: enemy, def: character, characterAttack: false };
+  return {
+    attacker: character.SPD > enemy.SPD ? character : enemy,
+    defender: character.SPD > enemy.SPD ? enemy : character,
+    characterAttack: character.SPD > enemy.SPD,
+  };
 };
 
 const defineDrop = ({ drops = [] }) => {
@@ -53,28 +48,18 @@ const getMoment = (v) =>
     v.MANA >= 0 ? v.MANA : 0
   }/${v.MAXMANA}`;
 
-const getArenaStatus = (val) => {
-  console.log();
-  arenaStatusMessage(
-    val.characterAttack
-      ? `${getMoment(val.att)} ( VS ) ${getMoment(val.def)}`
-      : `${getMoment(val.def)} ( VS ) ${getMoment(val.att)}`,
-  );
-  console.log();
-};
-
 const endFight = async (character, enemy, val) => {
   const characterIsDead = val.characterAttack
-    ? val.att.HP <= 0
-    : val.def.HP <= 0;
+    ? val.attacker.HP <= 0
+    : val.defender.HP <= 0;
   if (characterIsDead) {
     character.stage = 'death';
     character.location = 'deathOffice';
   } else {
-    character.HP = val.characterAttack ? val.att.HP : val.def.HP;
+    character.HP = val.characterAttack ? val.attacker.HP : val.defender.HP;
     const drop = defineDrop(enemy);
     const item = getItem(character, drop.name);
-    const name = val.characterAttack ? val.def.name : val.att.name;
+    const name = val.characterAttack ? val.defender.name : val.attacker.name;
     const plural = drop.amount > 1 ? 's' : '';
     addDropToInventory(character, drop);
 
@@ -92,7 +77,7 @@ const endFight = async (character, enemy, val) => {
 };
 
 const switchPlaces = (val) => {
-  if (parseInt(val.att.SPD / val.def.SPD) > 2) {
+  if (parseInt(val.attacker.SPD / val.defender.SPD) > 2) {
     arenaStatusMessage(
       `Because of an immence difference in speed, ${
         val.characterAttack ? 'you can attack again' : 'you are attacked again.'
@@ -104,78 +89,87 @@ const switchPlaces = (val) => {
     }
   }
 
-  const oldAttacker = { ...val.att };
-  const oldDefender = { ...val.def };
+  const oldAttacker = { ...val.attacker };
+  const oldDefender = { ...val.defender };
 
-  val.att = oldDefender;
-  val.def = oldAttacker;
+  val.attacker = oldDefender;
+  val.defender = oldAttacker;
   val.characterAttack = !val.characterAttack;
 };
 
+const getArenaStatus = (round) => {
+  arenaStatusMessage(
+    round.characterAttack
+      ? `${getMoment(round.attacker)} ( VS ) ${getMoment(round.defender)}`
+      : `${getMoment(round.defender)} ( VS ) ${getMoment(round.attacker)}`,
+  );
+};
+
 const runFight = async (character, enemy, options) => {
+  systemMessage(`You encounter a ${enemy.name}\n\n`);
+
   const characterValues = getCharacterStatistics(character);
   const enemyValues = getCharacterStatistics(enemy);
 
-  const requester = attainAttackerAndDefender(characterValues, enemyValues);
-  getArenaStatus(requester);
+  const round = defineFirstRound(characterValues, enemyValues);
+  
   let sequence = true;
 
-  const doNextAttack = async (val) => {
-    getArenaStatus(val);
+  const doNextAttack = async () => {
     await staller(options.stall || fightStallTime);
-    const isFight = val.att.HP > 0 && val.def.HP > 0;
+    const isFight = round.attacker.HP > 0 && round.defender.HP > 0;
     if (!isFight) {
-      await endFight(character, enemy, val);
+      await endFight(character, enemy, round);
       sequence = false;
       return;
     }
-    switchPlaces(val);
+    switchPlaces(round);
   };
 
-  systemMessage(
-    `You encounter a ${
-      requester.characterAttack ? requester.def.name : requester.att.name
-    }`,
-  );
   while (sequence) {
-    const damage = await getDamage(requester, options);
-
+    const damage = await getDamage(round, options);
+    if (round.characterAttack) {
+      console.clear();
+      console.log();
+      getArenaStatus(round);
+      console.log();
+    }
     switch (damage.type) {
       case attackTypes.dodged:
         arenaAnyMessage(
-          requester.characterAttack
-            ? `You attack the ${requester.def.name} but it dodges you.`
-            : `The ${requester.att.name} attacks you, but you manage to dodge the attack.`,
+          round.characterAttack
+            ? `You attack the ${round.defender.name} but it dodges you.`
+            : `The ${round.attacker.name} attacks you, but you manage to dodge the attack.`,
         );
-        await doNextAttack(requester);
+        await doNextAttack(round);
         break;
       case attackTypes.missed:
         arenaAnyMessage(
-          requester.characterAttack
-            ? `You attack but miss the ${requester.def.name}.`
-            : `The ${requester.att.name} attacks but misses you.`,
+          round.characterAttack
+            ? `You attack but miss the ${round.defender.name}.`
+            : `The ${round.attacker.name} attacks but misses you.`,
         );
-        await doNextAttack(requester);
+        await doNextAttack(round);
         break;
       case attackTypes.hit:
         arenaDamageMessage(
-          requester.characterAttack
-            ? `You manage to land a hit on the ${requester.def.name} for ${damage.value} HP.`
-            : `The ${requester.att.name} damages you for ${damage.value} HP.`,
+          round.characterAttack
+            ? `You manage to land a hit on the ${round.defender.name} for ${damage.value} HP.`
+            : `The ${round.attacker.name} damages you for ${damage.value} HP.`,
         );
-        requester.def.HP -= parseInt(damage.value, 10);
-        await doNextAttack(requester);
+        round.defender.HP -= parseInt(damage.value, 10);
+        await doNextAttack(round);
         break;
       case attackTypes.deflected:
         const deflected = parseInt(damage.value * 0.15, 10);
         arenaDamageMessage(
-          requester.characterAttack
-            ? `You manage to land a hit on the ${requester.def.name} for ${damage.value} HP, somehow it deflects ${deflected} HP.`
-            : `The ${requester.att.name} hits you for ${damage.value} HP. You manage to deflect ${deflected} HP.`,
+          round.characterAttack
+            ? `You manage to land a hit on the ${round.defender.name} for ${damage.value} HP, somehow it deflects ${deflected} HP.`
+            : `The ${round.attacker.name} hits you for ${damage.value} HP. You manage to deflect ${deflected} HP.`,
         );
-        requester.def.HP -= damage.value;
-        requester.att.HP -= deflected;
-        await doNextAttack(requester);
+        round.defender.HP -= damage.value;
+        round.attacker.HP -= deflected;
+        await doNextAttack(round);
         break;
       case attackTypes.avoided:
         arenaAnyMessage(
@@ -184,21 +178,21 @@ const runFight = async (character, enemy, options) => {
         sequence = false;
         break;
       case attackTypes.avoidFailed:
-        const failDamage = parseInt(requester.att.maxHealth * 0.1, 10);
+        const failDamage = parseInt(round.attacker.MAXHP * 0.1, 10);
         arenaDamageMessage(
-          `While trying to run away, the ${requester.def.name} hits you on the back for ${failDamage} HP`,
+          `While trying to run away, the ${round.defender.name} hits you on the back for ${failDamage} HP`,
         );
-        requester.att.HP -= failDamage;
-        await doNextAttack(requester);
+        round.attacker.HP -= failDamage;
+        await doNextAttack(round);
         break;
       case attackTypes.retaliated:
         arenaDamageMessage(
-          requester.characterAttack
-            ? `You stumble during your attack. The ${requester.def.name} sees a chance to hit you for ${damage.value} HP.`
-            : `The ${requester.att.name} stumbles. You use the chance and hit ${damage.value} HP.`,
+          round.characterAttack
+            ? `You stumble during your attack. The ${round.defender.name} sees a chance to hit you for ${damage.value} HP.`
+            : `The ${round.attacker.name} stumbles. You use the chance and hit ${damage.value} HP.`,
         );
-        requester.att.HP -= damage.value;
-        await doNextAttack(requester);
+        round.attacker.HP -= damage.value;
+        await doNextAttack(round);
         break;
     }
   }

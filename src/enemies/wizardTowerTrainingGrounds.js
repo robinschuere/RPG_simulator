@@ -73,9 +73,7 @@ const hobgoblin = () => ({
     [slots.RIGHTHAND]: { name: 'goblinSpear' },
     [slots.LEFTHAND]: { name: 'goblinShield' },
   },
-  defeatedRaces: [
-    { name: 'Human', amount: 50 },
-  ],
+  defeatedRaces: [{ name: 'Human', amount: 50 }],
   drops: [
     { name: 'coin', amount: 1, chance: 20 },
     { name: 'coin', amount: 2, chance: 20 },

@@ -1,6 +1,6 @@
 const { v4: uuid } = require('uuid');
 const { systemMessage } = require('./messages');
-const { options, statistics, defaultValues } = require('../constants');
+const { options, statistics, characterDefaults } = require('../constants');
 const { optionAction, confirmAction } = require('./promptActions');
 
 const getGenderLabel = (character) => {
@@ -54,10 +54,11 @@ const raiseLevel = async (character) => {
           raisers.push({ key: raise.value, amount: 1 });
         }
       }
+      console.clear();
       const confirm = await confirmAction(
-        `Are you sure? You will be elevating\n${raisers
+        `Are you sure? You will be elevating\n\n${raisers
           .map((f) => `${f.key}: +${f.amount}`)
-          .join('\n')}`,
+          .join('\n')}\n`,
       );
       if (confirm) {
         raisers.forEach((f) => raiseStatistic(character, f.key, f.amount));
@@ -109,7 +110,7 @@ const elevateCharacterStatistics = async (character, values) => {
 };
 
 const getBeginner = () => {
-  const character = { id: uuid(), ...defaultValues };
+  const character = { id: uuid(), ...characterDefaults };
   character.MAXHP = getMaxHealth(character);
   character.HP = getMaxHealth(character);
   character.NEXTEXP = defineNextLevel(character);

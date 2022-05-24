@@ -4,6 +4,7 @@
   "description": "a node console game",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"**/**/*.js\"",
     "play": "node game.js"
   },
   "keywords": [

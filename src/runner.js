@@ -2,7 +2,10 @@ require('colors');
 const { runStory } = require('./stories');
 const { runIdle } = require('./idle');
 const { runTraining } = require('./training');
-const { characterStages, helpPage, stallTime } = require('./constants');
+const {
+  characterStages,
+  pages: { help: helpPage },
+} = require('./constants');
 const { getBeginner } = require('./helpers/characterHelpers');
 const { argumentTranslator } = require('./helpers/argumentHelper');
 const {

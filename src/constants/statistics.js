@@ -8,4 +8,4 @@ module.exports = {
   DEF: 'DEF',
   ACC: 'ACC',
   SPD: 'SPD',
-}
+};

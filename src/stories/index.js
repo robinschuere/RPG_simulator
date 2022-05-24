@@ -46,7 +46,7 @@ const runStory = async (character, stop, { stall, doNotCleanConsole }) => {
     } else if (val.stall) {
       await staller(stall || val.stall);
     } else if (val.action) {
-      await val.action(character, stop, options);
+      await val.action(character);
     }
   }
   if (!doNotCleanConsole) {

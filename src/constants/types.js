@@ -19,4 +19,4 @@ module.exports = {
     avoided: 'avoided',
     avoidFailed: 'avoidFailed',
   },
-}
+};

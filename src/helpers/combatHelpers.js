@@ -1,5 +1,9 @@
-const { slots, itemTypes } = require('../constants');
-const { raiseStatistic, getMaxHealth, getMaxMana } = require('./characterHelpers');
+const { slots, itemTypes, masteryThresholds } = require('../constants');
+const {
+  raiseStatistic,
+  getMaxHealth,
+  getMaxMana,
+} = require('./characterHelpers');
 const { getItem } = require('./itemHelpers');
 
 const heal = (character, amount) => {
@@ -63,19 +67,19 @@ const getCharacterStatistics = (character, enemy) => {
     SPD: character.SPD,
   };
 
-  character.defeatedRaces ||
-    []
+  (character.defeatedRaces ||
+    [])
       .filter((f) => f.name === enemy.race)
       .forEach(({ amount }) => {
         [10, 50, 100, 500, 1000, 10000, 100000].forEach((step) => {
           if (amount > step) {
-            values.STR += defeatedRaceThresholds[step].STR || 0;
-            values.DEF += defeatedRaceThresholds[step].DEF || 0;
-            values.WIS += defeatedRaceThresholds[step].WIS || 0;
-            values.DEX += defeatedRaceThresholds[step].DEX || 0;
-            values.INT += defeatedRaceThresholds[step].INT || 0;
-            values.ACC += defeatedRaceThresholds[step].ACC || 0;
-            values.SPD += defeatedRaceThresholds[step].SPD || 0;
+            values.STR += masteryThresholds[step].STR || 0;
+            values.DEF += masteryThresholds[step].DEF || 0;
+            values.WIS += masteryThresholds[step].WIS || 0;
+            values.DEX += masteryThresholds[step].DEX || 0;
+            values.INT += masteryThresholds[step].INT || 0;
+            values.ACC += masteryThresholds[step].ACC || 0;
+            values.SPD += masteryThresholds[step].SPD || 0;
           }
         });
       });

@@ -35,4 +35,3 @@ At this moment, 3 stages are available
 => it is possible to update a character through the function elevateCharacterStatistics.
 => This works with every statistic (STR, DEF, ...)
 => EXP is always handled as the last statistic for raising a level. (Raising a level will halt the process since the player should be able to select 3 stats to raise.)
-=> This way, quests and or items can give a raise on a ststatisticat undependant of leveling.

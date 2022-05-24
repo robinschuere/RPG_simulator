@@ -7,19 +7,12 @@ const {
   addDropToInventory,
   swapItemFromInventoryToWieldingSlot,
 } = require('../helpers/inventoryHelpers');
-const {
-  options,
-  slots,
-  quests,
-  statistics,
-  narrators,
-} = require('../constants');
+const { options, slots, statistics, narrators } = require('../constants');
 const {
   elevateCharacterStatistics,
   getGenderLabel,
 } = require('../helpers/characterHelpers');
 const { getCharacterCard } = require('../helpers/textHelpers');
-const { startQuest } = require('../helpers/questHelpers');
 const { saveCharacter } = require('../helpers/fileHelpers');
 
 const elevation = [
@@ -101,8 +94,8 @@ const changeWorld = (character) =>
   changeCharacterParameter(character, 'world', '', 'your world');
 
 const complete = async (character) => {
-  const c = await confirmAction();
-  if (c) {
+  const confirmed = await confirmAction();
+  if (confirmed) {
     const race = options.race.find((f) => f.key === character.race);
     character.stage = 'idle';
     character.location = 'wizardTower';
@@ -144,8 +137,6 @@ const complete = async (character) => {
       },
       { statName: statistics.EXP, value: 50 },
     ]);
-
-    startQuest(character, quests.aFirstEncounter);
 
     return character;
   } else {

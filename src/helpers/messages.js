@@ -19,7 +19,7 @@ const npcMessage = (narrator, message) => {
 };
 
 const characterMessage = (character, message) => {
-  console.log(`${character.name}: ${message}`.white);
+  console.log(`${character.name || '???'}: ${message}`.white);
 };
 
 module.exports = {

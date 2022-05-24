@@ -3,7 +3,7 @@ const {
   attackTypes,
   options: { attack },
 } = require('../constants');
-const { systemMessage } = require('./messages');
+const { systemMessage, arenaStatusMessage } = require('./messages');
 const { optionAction } = require('./promptActions');
 
 const avoid = (val) => {
@@ -14,7 +14,8 @@ const avoid = (val) => {
 const dodged = (val) => {
   // dodgeChance is maxed at 30%;
   const randomizer = Math.floor(Math.random() * 100);
-  const dodgeChance = 100 - val.dodge > 70 ? 100 - val.dodge : 70;
+  const chance = (100 - val.dodge) > 70;
+  const dodgeChance = chance ? 100 - val.dodge : 70;
   return randomizer >= dodgeChance;
 };
 
@@ -32,19 +33,19 @@ const hit = (val) => {
   }
 };
 
-const physicalHit = (att, def) => {
-  if (dodged(def)) return { type: attackTypes.dodged };
-  if (hit(att)) {
+const physicalHit = (attacker, defender) => {
+  if (dodged(defender)) return { type: attackTypes.dodged };
+  if (hit(attacker)) {
     const attValue = Math.floor(
-      Math.random() * parseInt(att.physicalOffence * 0.8, 10),
+      Math.random() * parseInt(attacker.physicalOffence * 0.8, 10),
     );
     const defValue = Math.floor(
-      Math.random() * parseInt(def.physicalDefence * 0.5, 10),
+      Math.random() * parseInt(defender.physicalDefence * 0.5, 10),
     );
     const hitValue = attValue - defValue;
     if (hitValue < 0) return { type: attackTypes.retaliated, value: -hitValue };
     else {
-      if (deflected(def)) {
+      if (deflected(defender)) {
         return { type: attackTypes.deflected, value: hitValue };
       }
       return { type: attackTypes.hit, value: hitValue };
@@ -53,16 +54,16 @@ const physicalHit = (att, def) => {
   return { type: attackTypes.missed };
 };
 
-const arcaneHit = (att, def) => {
-  if (dodged(def)) return { type: attackTypes.dodged };
-  if (hit(att)) {
-    const attValue = Math.floor(Math.random() * (att.INT * 0.8));
-    const defValue = Math.floor(Math.random() * (def.WIS * 0.5));
+const arcaneHit = (attacker, defender) => {
+  if (dodged(defender)) return { type: attackTypes.dodged };
+  if (hit(attacker)) {
+    const attValue = Math.floor(Math.random() * (attacker.INT * 0.8));
+    const defValue = Math.floor(Math.random() * (defender.WIS * 0.5));
     const hitValue = attValue - defValue;
     if (hitValue < 0)
       return { type: attackTypes.retaliated, value: -parseInt(hitValue, 10) };
     else {
-      if (deflected(def)) {
+      if (deflected(defender)) {
         return { type: attackTypes.deflected, value: parseInt(hitValue, 10) };
       }
       return { type: attackTypes.hit, value: parseInt(hitValue, 10) };
@@ -71,39 +72,42 @@ const arcaneHit = (att, def) => {
   return { type: attackTypes.missed };
 };
 
-const doAttack = (att, def) => {
+const doAttack = (attacker, defender) => {
   const rollAgainst =
-    att.offenceType === itemTypes.physical
+    attacker.offenceType === itemTypes.physical
       ? itemTypes.physicalDefensive
       : itemTypes.arcaneDefensive;
   switch (rollAgainst) {
     case itemTypes.physicalDefensive:
-      return physicalHit(att, def);
+      return physicalHit(attacker, defender);
     case itemTypes.arcaneDefensive:
-      return arcaneHit(att, def);
+      return arcaneHit(attacker, defender);
     default:
       throw new Error('Itemtype unexisting');
   }
 };
 
-const getDamage = async (requester, { auto = false }) => {
-  if (requester.characterAttack && !requester.auto) {
-    const options = auto ? [...attack, { key: 'A', value: 'Auto-attack' }] : attack;
+const getDamage = async (round, { auto = false }) => {
+  if (round.characterAttack && !round.auto) {
+    const options = auto
+      ? [...attack, { key: 'A', value: 'Auto-attack' }]
+      : attack;
     const option = await optionAction('What do you do?', options);
+    
     switch (option.key) {
       case 'A':
-        requester.auto = true;
+        round.auto = true;
         systemMessage('You cannot intervene anymore in this fight.');
-        return doAttack(requester.att, requester.def);
+        return doAttack(round.attacker, round.defender);
       case '2':
-        return avoid(requester.att)
+        return avoid(round.attacker)
           ? { type: attackTypes.avoided }
           : { type: attackTypes.avoidFailed };
       default:
-        return doAttack(requester.att, requester.def);
+        return doAttack(round.attacker, round.defender);
     }
   }
-  return doAttack(requester.att, requester.def);
+  return doAttack(round.attacker, round.defender);
 };
 
 module.exports = {
