@@ -23,16 +23,19 @@ const runner = async (args) => {
   let running = true;
   const options = argumentTranslator(args);
   if (options.help) {
-    console.log(helpPage.blue)
+    console.log(helpPage.blue);
     return;
   }
 
   const character = await openOrCreateCharacter();
+  if (!options.doNotCleanConsole) {
+    console.clear();
+  }
   const stop = () => (running = false);
   while (running) {
     switch (character.stage) {
       case characterStages.introduction:
-        await runStory(character, options);
+        await runStory(character, stop, options);
         break;
       case characterStages.idle:
         await runIdle(character, stop, options);

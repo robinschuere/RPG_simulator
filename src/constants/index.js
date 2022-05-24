@@ -1,10 +1,10 @@
-const options = require("./options");
-const slots = require("./slots");
-const { questStages, characterStages } = require("./stages");
-const statistics = require("./statistics");
-const { masteryThresholds } = require("./thresholds");
-const { itemTypes, spellTypes, attackTypes } = require("./types");
-const types = require("./types");
+const options = require('./options');
+const slots = require('./slots');
+const { questStages, characterStages } = require('./stages');
+const statistics = require('./statistics');
+const { masteryThresholds } = require('./thresholds');
+const { itemTypes, spellTypes, attackTypes } = require('./types');
+const types = require('./types');
 
 module.exports = {
   slots,
@@ -20,9 +20,7 @@ module.exports = {
     aFirstEncounter: {
       name: 'A first encounter',
       requirements: {
-        statistics: {
-
-        },
+        statistics: {},
         quests: [],
       },
       statistics: { EXP: 25, STR: 1, DEF: 1, SPD: 1 },
@@ -124,4 +122,8 @@ module.exports = {
   },
   storyStallTime: 3,
   fightStallTime: 1.5,
-}
+  narrators: {
+    SYSTEM: 'SYSTEM',
+    YOU: 'YOU',
+  },
+};

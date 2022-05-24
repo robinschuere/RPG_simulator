@@ -23,20 +23,26 @@ const confirmAction = async (message = '') => {
     name: 'confirm',
     message: `${message}\n(type [Y]es or [N]o to continue)`,
   });
-  return ['', 'Y', 'YES'].includes(response.confirm.toUpperCase());
+  if (['Y', 'YES'].includes(response.confirm.toUpperCase())) {
+    return true;
+  }
+  if (['N', 'NO'].includes(response.confirm.toUpperCase())) {
+    return false;
+  }
+  return confirmAction(message);
 };
 
 /**
- * 
+ *
  * @param {String} message the message that will be displayed
- * @param {String} info 
+ * @param {String} info
  * @returns {String}
  */
 const freeAction = async (message = '', info = 'anything') => {
   const response = await prompt({
     type: 'input',
     name: 'free',
-    message: `${message ? `${message}\n`: ''}(type ${info} and press ENTER)`,
+    message: `${message ? `${message}\n` : ''}(type ${info} and press ENTER)`,
   });
   return response.free;
 };

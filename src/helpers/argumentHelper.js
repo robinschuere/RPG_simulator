@@ -1,10 +1,14 @@
 const argumentTranslator = (args) => {
   const variables = {};
   const acceptedVariables = [
-    '--stall', '-s', 
-    '--no-clear', '-c', 
-    '--help', '-h',
-    '--auto', '-a',
+    '--stall',
+    '-s',
+    '--no-clear',
+    '-c',
+    '--help',
+    '-h',
+    '--auto',
+    '-a',
   ];
 
   args.forEach((f) => {
@@ -18,13 +22,19 @@ const argumentTranslator = (args) => {
       }
       if (['--help', '-h'].includes(f)) {
         variables.help = true;
-      } 
+      }
       if (['--auto', '-a'].includes(f)) {
         variables.auto = true;
-      } 
+      }
     }
   });
-  return variables;
+  return {
+    stall: 0,
+    doNotCleanConsole: false,
+    help: false,
+    auto: false,
+    ...variables,
+  };
 };
 
 module.exports = {

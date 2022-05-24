@@ -39,6 +39,9 @@ const runIdle = async (character, stop, { doNotCleanConsole = false }) => {
     { key: 'Q', value: 'Quit', action: () => quit(character) },
   ];
   const option = await optionAction(`You stand at ${idle.name}`, idleOptions);
+  if (!doNotCleanConsole) {
+    console.clear();
+  }
   await option.action(character);
 };
 

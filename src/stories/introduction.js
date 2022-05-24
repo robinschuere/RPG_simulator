@@ -7,8 +7,17 @@ const {
   addDropToInventory,
   swapItemFromInventoryToWieldingSlot,
 } = require('../helpers/inventoryHelpers');
-const { options, slots, quests, statistics } = require('../constants');
-const { elevateCharacterStatistics, getGenderLabel } = require('../helpers/characterHelpers');
+const {
+  options,
+  slots,
+  quests,
+  statistics,
+  narrators,
+} = require('../constants');
+const {
+  elevateCharacterStatistics,
+  getGenderLabel,
+} = require('../helpers/characterHelpers');
 const { getCharacterCard } = require('../helpers/textHelpers');
 const { startQuest } = require('../helpers/questHelpers');
 const { saveCharacter } = require('../helpers/fileHelpers');
@@ -86,9 +95,10 @@ const changeRace = async (character) => {
   return character;
 };
 
-const changeName = (character) => changeCharacterParameter(character, 'name', '', 'your name');
-const changeWorld = (character) => changeCharacterParameter(character, 'world', '', 'your world');
-
+const changeName = (character) =>
+  changeCharacterParameter(character, 'name', '', 'your name');
+const changeWorld = (character) =>
+  changeCharacterParameter(character, 'world', '', 'your world');
 
 const complete = async (character) => {
   const c = await confirmAction();
@@ -96,16 +106,42 @@ const complete = async (character) => {
     const race = options.race.find((f) => f.key === character.race);
     character.stage = 'idle';
     character.location = 'wizardTower';
-    const raceElevationStatistics = elevation.find(s => s.key === character.race);
+    const raceElevationStatistics = elevation.find(
+      (s) => s.key === character.race,
+    );
     await elevateCharacterStatistics(character, [
-      { statName: statistics.HEA, value: raceElevationStatistics.raisedStatistics.HEA },
-      { statName: statistics.STR, value: raceElevationStatistics.raisedStatistics.STR },
-      { statName: statistics.WIS, value: raceElevationStatistics.raisedStatistics.WIS },
-      { statName: statistics.INT, value: raceElevationStatistics.raisedStatistics.INT },
-      { statName: statistics.DEX, value: raceElevationStatistics.raisedStatistics.DEX },
-      { statName: statistics.DEF, value: raceElevationStatistics.raisedStatistics.DEF },
-      { statName: statistics.ACC, value: raceElevationStatistics.raisedStatistics.ACC },
-      { statName: statistics.SPD, value: raceElevationStatistics.raisedStatistics.SPD },
+      {
+        statName: statistics.HEA,
+        value: raceElevationStatistics.raisedStatistics.HEA,
+      },
+      {
+        statName: statistics.STR,
+        value: raceElevationStatistics.raisedStatistics.STR,
+      },
+      {
+        statName: statistics.WIS,
+        value: raceElevationStatistics.raisedStatistics.WIS,
+      },
+      {
+        statName: statistics.INT,
+        value: raceElevationStatistics.raisedStatistics.INT,
+      },
+      {
+        statName: statistics.DEX,
+        value: raceElevationStatistics.raisedStatistics.DEX,
+      },
+      {
+        statName: statistics.DEF,
+        value: raceElevationStatistics.raisedStatistics.DEF,
+      },
+      {
+        statName: statistics.ACC,
+        value: raceElevationStatistics.raisedStatistics.ACC,
+      },
+      {
+        statName: statistics.SPD,
+        value: raceElevationStatistics.raisedStatistics.SPD,
+      },
       { statName: statistics.EXP, value: 50 },
     ]);
 
@@ -144,8 +180,14 @@ const giveEquipment = (character) => {
     amount: 1,
   });
   const tunic = addDropToInventory(character, { name: 'tunic', amount: 1 });
-  const pants = addDropToInventory(character, { name: 'leatherPants', amount: 1 });
-  const boots = addDropToInventory(character, { name: 'leatherBoots', amount: 1 });
+  const pants = addDropToInventory(character, {
+    name: 'leatherPants',
+    amount: 1,
+  });
+  const boots = addDropToInventory(character, {
+    name: 'leatherBoots',
+    amount: 1,
+  });
   swapItemFromInventoryToWieldingSlot(character, shortSword, slots.RIGHTHAND);
   swapItemFromInventoryToWieldingSlot(character, tunic, slots.BODY);
   swapItemFromInventoryToWieldingSlot(character, pants, slots.LEGS);
@@ -162,27 +204,24 @@ const save = async (character) => {
 
 const story = [
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
       'The smell of smoke and blood fills your nose and you feel like you made one hell of a trip.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
       'You open your eyes and see an old grey bearded man towering over you.',
   },
   {
-    narrator: 'System',
-    message: 'You finally grasp that you are no longer in your house.',
-  },
-  {
-    narrator: 'System',
-    message: 'Rather, you lay down on a table in a dim litted room.',
-  },
-  {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'The man starts talking. However, you cannot make anything of the sounds he throws at you.',
+      'You finally grasp that you are no longer in your house but that you lay down on a table in a dimly lit room',
+  },
+  {
+    narrator: narrators.SYSTEM,
+    message:
+      'The man starts talking. However, you do not understand a word he speaks.',
   },
   {
     narrator: 'A strange man',
@@ -190,55 +229,58 @@ const story = [
       'Hoor ah, Acantrr Taraask sinteluer chara vaan tghaar s eghoom ternili vlatos.',
   },
   {
-    narrator: 'System',
-    message: 'The man abruptly stops talking, looks at you and sighs.',
+    narrator: narrators.SYSTEM,
+    message:
+      'The man abruptly stops talking, looks at you and stomps his head. Quickly he turns around to grab a staff laying on a nearby table',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'The man grabs a staff that lays on a nearby table and points it at you. A pale blue light forms aroung the head of the staff.',
+      'You see the man weaving his hands around the head of the staff. A pale blue shimmering light surrounds the man as he steps towards you.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'Excrutiating pain goes through your skull. You feel how your body gets lifted until only your hands and heels are on the table.',
+      'Excrutiating pain goes through your skull. You feel how your body is lifted until only your hands and heels are on the table. As if that was not enough, you feel the staff on your forehead.\nYou feel like your head is about to explode.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'After what seemed like a very long time, you feel how the pain subdues.',
+      'As sudden pain occurred, as soon as the contact with the staff is broken, the pain goes away.',
   },
   {
     narrator: 'A strange man',
     message: 'How are you feeling?',
   },
   {
-    narrator: 'System',
-    message:
-      'Still flabbergasted, you can only look at the man. You start blabbering. The staff starts turning red...',
+    narrator: narrators.SYSTEM,
+    message: 'Words start mumbling out of your mouth.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.YOU,
+    message: 'What ....',
+  },
+  {
+    narrator: narrators.YOU,
+    message: 'How did you',
+  },
+  {
+    narrator: narrators.YOU,
+    message: 'What did you do to me?',
+  },
+  {
+    narrator: 'a strange man',
     message:
-      'You feel how something gets a hold of your voice. Clearly you state your name.',
+      'I will not tell you that, however, would you like me to tell me your name?',
   },
   { action: changeName },
   {
     narrator: 'A strange man',
     messageWithParams: (character) =>
-      `So your name is ${character.name}. Wonderfull.`,
-  },
-  {
-    narrator: 'System',
-    message:
-      'Before you can correctly react, the next thing you feel that crosses your lips is what gender you have.',
-  },
-  { action: changeGender },
-  {
-    narrator: 'System',
-    message: 'Followed by the place you come from...',
+      `So your name is ${character.name}. Wonderfull. Could you tell me of what world you are? And please, how they call your gender?`,
   },
   { action: changeWorld },
+  { action: changeGender },
   {
     narrator: 'Mizgog',
     messageWithParams: (character) =>
@@ -247,35 +289,27 @@ const story = [
       }. This is so exciting.`,
   },
   {
-    narrator: 'System',
-    message: 'You see the red light from the staff starving away.',
-  },
-  {
     narrator: 'A strange man',
     message:
-      'Where are my manners. I go by Mizgog. The Archmage of Tyrangael. A grand city of Kuramzo.',
-  },
-  {
-    narrator: 'Mizgog',
-    message:
-      'I am terribly sorry for that painfull spell, but it was the only way to make you understand my language.',
+      'Where are my manners. I summon you to this place, I perform an ancient translator spell which I can only presume hurts a lot. I am terribly sorry for that. I go by Mizgog. The Archmage of Tyrangael. A grand city of Kuramzo.',
   },
   {
     narrator: 'Mizgog',
     message: 'Now. There is a reason why you are here ... Let me quickly...',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'The man again lifts his staff. This time, you jump from the table',
+      'The man again points his staff at your chest. This time, you jump from the table',
   },
   {
-    narrator: 'you',
-    message: 'NO! Put that thing down',
+    narrator: narrators.YOU,
+    message: 'NO! Put that thing down. NOW!',
   },
   {
-    narrator: 'System',
-    message: 'Mizgog stops his motion and looks at you.',
+    narrator: narrators.SYSTEM,
+    message:
+      'Mizgog stops his motion and looks at you. You see no form of hesitation in his eyes.',
   },
   {
     narrator: 'Mizgog',
@@ -284,49 +318,42 @@ const story = [
   },
   {
     narrator: 'Mizgog',
-    message: 'You see, I wanted to check on your soul affinities.',
-  },
-  {
-    narrator: 'Mizgog',
-    message: 'Your body as of now is but a mere vessel',
+    message:
+      'You see, I wanted to check on your soul affinities. Your body as of now is but a mere vessel. Bound by nothing more than my magic essence.',
   },
   {
     narrator: 'Mizgog',
     message:
-      'The vessel is now fueled by my magic. But that drain is of such a high rate that I am not able to maintain it very long. ',
+      'Alas, even as the Archmage, my magic essence is not unlimited and soon the vessel will break by which your soul shall perish.',
   },
   {
     narrator: 'Mizgog',
     message:
-      'After I run out of my mana, your vessel will break and your soul will die.',
+      'However, thanks to my master, I learned how to create a more robust vessel. One that must be fueled, but no longer by magical essence.',
   },
   {
     narrator: 'Mizgog',
     message:
-      'Luckily, I learned through scrolls provided by my ancestor Trask how to capture the affinity and imbue the vessel',
+      'The way I see it you have no options, or your soul perishes, or you let me perform the ritual. This is a more unique ritual, which will not hurt you as the ancients magic did. The spell will give you insight in who you can become, and will point you to a creature of this world.',
   },
   {
-    narrator: 'Mizgog',
+    narrator: narrators.SYSTEM,
     message:
-      'The way I see it you have no options. So stop being a scaredy cat and let me perform the ritual.',
+      'You ponder for a moment what you should do. You are not completely fine with the progress of things, but finaly, you accept.',
   },
   {
-    narrator: 'you',
+    narrator: narrators.YOU,
     message: 'Fine. Just get it over with.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'Once again, the man lifts his staff. This time however you feel how your consciousness starts lifting up.',
+      'Mizgog raises his staff and touches your forehead again. This time however you feel like your mind is expanding.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
-      'Images of figures start springing in your minds eye untill you can make out their features.',
-  },
-  {
-    narrator: 'System',
-    message: 'The most prominent feature reaches out his hand to you.',
+      'Images of figures start springing in your minds eye until you make out their features. The most prominent figure reaches out his hand to you.',
   },
   { action: changeRace },
   {
@@ -335,13 +362,13 @@ const story = [
       'Wonderfull. I will now teach you the spell so you can see what your affinity is!',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message: 'The man teaches you the spell "Check My statzz".',
   },
   { action: learnSpell },
   { action: getCharacterCard },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message: 'Do you accept these values?',
   },
   { action: complete },
@@ -351,7 +378,7 @@ const story = [
       'Now that we have this out of the way. Perhaps I should give you some clothings. Since, you are totally naked.',
   },
   {
-    narrator: 'System',
+    narrator: narrators.SYSTEM,
     message:
       'You turn red as that was untill this moment the least of you concerns.',
   },

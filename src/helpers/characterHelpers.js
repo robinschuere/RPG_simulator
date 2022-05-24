@@ -11,7 +11,7 @@ const getGenderLabel = (character) => {
 const getRaceLabel = (character) => {
   const race = options.race.find((f) => f.key === character.race);
   return race ? race.value : 'UNKNOWN';
-}
+};
 
 const getMaxHealth = (character) => {
   return character.HEA * 5 + character.WIS * 2 + character.DEF * 2;
@@ -39,12 +39,15 @@ const raiseLevel = async (character) => {
     while (isRaising) {
       console.log();
       systemMessage(
-        'Congratulations. You have gained a lvl. You can now update 5 of your character characteristics.',
-        );
+        'Congratulations. You have gained a level. You can now update 5 of your character characteristics.',
+      );
       console.log();
       const raisers = [];
       for (let index = 0; index < 5; index++) {
-        const raise = await optionAction('Select a stat.', options.statistics);
+        const raise = await optionAction(
+          `Select a statistic upgrade.`,
+          options.statistics,
+        );
         if (raisers.find((f) => f.key === raise.value)) {
           raisers.find((f) => f.key === raise.value).amount += 1;
         } else {

@@ -1,4 +1,4 @@
-const { options, storyStallTime } = require('../constants');
+const { options, storyStallTime, narrators } = require('../constants');
 const {
   systemMessage,
   characterMessage,
@@ -11,27 +11,26 @@ const stories = {
 };
 
 const printStoryMessage = (character, value, options) => {
-  if (value.narrator === 'System') {
+  if (value.narrator === narrators.SYSTEM) {
     systemMessage(value.message);
-  } else if (value.narrator === 'you') {
+  } else if (value.narrator === narrators.YOU) {
     characterMessage(character, value.message);
   } else {
     npcMessage(value.narrator, value.message);
   }
-}
+};
 
 const printCustomStoryMessage = (character, value, options) => {
-  if (value.narrator === 'System') {
+  if (value.narrator === narrators.SYSTEM) {
     systemMessage(value.messageWithParams(character));
-  } else if (value.narrator === 'you') {
+  } else if (value.narrator === narrators.YOU) {
     characterMessage(character, value.messageWithParams(character));
   } else {
-    npcMessage(value.narrator, value.messageWithParams(character)); 
+    npcMessage(value.narrator, value.messageWithParams(character));
   }
-}
+};
 
-
-const runStory = async (character, { stall, doNotCleanConsole }) => {
+const runStory = async (character, stop, { stall, doNotCleanConsole }) => {
   const story = stories[character.stage];
   if (!story) {
     throw new Error('This story is not written yet!');
@@ -40,14 +39,14 @@ const runStory = async (character, { stall, doNotCleanConsole }) => {
     const val = story[index];
     if (val.message) {
       printStoryMessage(character, val, options);
-      await staller(stall || storyStallTime);
+      await staller(stall || val.stall || storyStallTime);
     } else if (val.messageWithParams) {
       printCustomStoryMessage(character, val, options);
-      await staller(stall || storyStallTime);
+      await staller(stall || val.stall || storyStallTime);
     } else if (val.stall) {
       await staller(stall || val.stall);
     } else if (val.action) {
-      await val.action(character, options);
+      await val.action(character, stop, options);
     }
   }
   if (!doNotCleanConsole) {
