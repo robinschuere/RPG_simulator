@@ -1,12 +1,17 @@
 const { v4: uuid } = require('uuid');
 const { systemMessage } = require('./messages');
-const { lists, stats, defaultValues } = require('../constants');
+const { options, statistics, defaultValues } = require('../constants');
 const { optionAction, confirmAction } = require('./promptActions');
 
 const getGenderLabel = (character) => {
-  const gender = lists.gender.find((f) => f.key === character.gender);
+  const gender = options.gender.find((f) => f.key === character.gender);
   return gender ? gender.value : 'UNKNOWN';
 };
+
+const getRaceLabel = (character) => {
+  const race = options.race.find((f) => f.key === character.race);
+  return race ? race.value : 'UNKNOWN';
+}
 
 const getMaxHealth = (character) => {
   return character.HEA * 5 + character.WIS * 2 + character.DEF * 2;
@@ -20,7 +25,7 @@ const defineNextLevel = (character) => {
   return parseInt(character.LVL + 300 * (character.LVL / 9), 10);
 };
 
-const raiseStat = (character, stat, value) => {
+const raiseStatistic = (character, stat, value) => {
   character[stat] += value;
   return character;
 };
@@ -32,12 +37,14 @@ const raiseLevel = async (character) => {
     character.LVL += 1;
     let isRaising = true;
     while (isRaising) {
+      console.log();
       systemMessage(
-        'Congratulations. You have gained a lvl. You can now update 5 stats.',
-      );
+        'Congratulations. You have gained a lvl. You can now update 5 of your character characteristics.',
+        );
+      console.log();
       const raisers = [];
       for (let index = 0; index < 5; index++) {
-        const raise = await optionAction('Select a stat.', lists.stat);
+        const raise = await optionAction('Select a stat.', options.statistics);
         if (raisers.find((f) => f.key === raise.value)) {
           raisers.find((f) => f.key === raise.value).amount += 1;
         } else {
@@ -50,7 +57,7 @@ const raiseLevel = async (character) => {
           .join('\n')}`,
       );
       if (confirm) {
-        raisers.forEach((f) => raiseStat(character, f.key, f.amount));
+        raisers.forEach((f) => raiseStatistic(character, f.key, f.amount));
         isRaising = false;
       }
     }
@@ -62,39 +69,39 @@ const raiseLevel = async (character) => {
 };
 
 const elevateCharacter = async (character, stat, value) => {
-  raiseStat(character, stat, value);
-  if (stat === stats.HEA) {
+  raiseStatistic(character, stat, value);
+  if (stat === statistics.HEA) {
     character.MAXHP = getMaxHealth(character);
     character.HP = getMaxHealth(character);
   }
-  if (stat === stats.INT) {
+  if (stat === statistics.INT) {
     character.MANA = getMaxMana(character);
     character.MAXMANA = getMaxMana(character);
   }
-  if (stat === stats.WIS) {
+  if (stat === statistics.WIS) {
     character.MAXHP = getMaxHealth(character);
   }
-  if (stat === stats.DEF) {
+  if (stat === statistics.DEF) {
     character.MAXHP = getMaxHealth(character);
   }
-  if (stat === stats.EXP) {
+  if (stat === statistics.EXP) {
     character.TOTALEXP += value;
     await raiseLevel(character);
   }
 };
 
-const elevateCharacterValues = async (character, values) => {
-  const EXPStat = values.find((s) => s.statName === stats.EXP);
-  const otherStats = values.filter((s) => s.statName !== stats.EXP);
+const elevateCharacterStatistics = async (character, values) => {
+  const EXPStatistic = values.find((s) => s.statName === statistics.EXP);
+  const otherStatistics = values.filter((s) => s.statName !== statistics.EXP);
 
-  for (let index = 0; index < otherStats.length; index++) {
+  for (let index = 0; index < otherStatistics.length; index++) {
     await elevateCharacter(
       character,
-      otherStats[index].statName,
-      otherStats[index].value,
+      otherStatistics[index].statName,
+      otherStatistics[index].value,
     );
   }
-  await elevateCharacter(character, stats.EXP, EXPStat.value);
+  await elevateCharacter(character, statistics.EXP, EXPStatistic.value);
   return character;
 };
 
@@ -119,10 +126,11 @@ const addDefeatedRace = (character, race) => {
 
 module.exports = {
   getGenderLabel,
-  elevateCharacterValues,
+  elevateCharacterStatistics,
   addDefeatedRace,
   getBeginner,
-  raiseStat,
+  raiseStatistic,
   getMaxMana,
   getMaxHealth,
+  getRaceLabel,
 };

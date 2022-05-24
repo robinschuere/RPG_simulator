@@ -1,4 +1,4 @@
-const { stages } = require('../constants');
+const { characterStages } = require('../constants');
 
 const idle = {
   name: 'the training grounds of the wizard tower',
@@ -11,7 +11,7 @@ const idle = {
     {
       key: 'B',
       value: 'Train against lesser creatures',
-      action: (character) => (character.stage = stages.training),
+      action: (character) => (character.stage = characterStages.training),
     },
   ],
 };

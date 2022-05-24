@@ -9,7 +9,7 @@ const idleLocations = {
   mizgogOfficeDoor: require('./mizgogOfficeDoor'),
 };
 
-const runIdle = async (character, stop) => {
+const runIdle = async (character, stop, { doNotCleanConsole = false }) => {
   const idle = idleLocations[character.location];
   if (!idle) {
     throw new Error(
@@ -23,7 +23,7 @@ const runIdle = async (character, stop) => {
       stop();
     }
   };
-  const options = [
+  const idleOptions = [
     ...idle.options,
     {
       key: '1',
@@ -38,7 +38,7 @@ const runIdle = async (character, stop) => {
     { key: 'S', value: 'Save', action: () => saveCharacter(character) },
     { key: 'Q', value: 'Quit', action: () => quit(character) },
   ];
-  const option = await optionAction(`You stand at ${idle.name}`, options);
+  const option = await optionAction(`You stand at ${idle.name}`, idleOptions);
   await option.action(character);
 };
 

@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const woodenClub = () => ({
   name: `Wooden club`,
   description: 'It seems like a small tree',
-  wieldSlot: [wieldSlots.RIGHTHAND],
+  wieldSlot: [slots.RIGHTHAND],
   stackable: false,
   type: itemTypes.physical,
   bonus: 1,

@@ -1,4 +1,4 @@
-const { wieldSlots } = require('../constants');
+const { slots } = require('../constants');
 
 const goblin = () => ({
   name: 'Goblin',
@@ -14,7 +14,7 @@ const goblin = () => ({
   SPD: 1,
   chance: 74,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'woodenClub' },
+    [slots.RIGHTHAND]: { name: 'woodenClub' },
   },
   drops: [
     { name: 'coin', amount: 1, chance: 20 },
@@ -42,7 +42,7 @@ const imp = () => ({
   SPD: 1,
   chance: 25,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'ironDagger' },
+    [slots.RIGHTHAND]: { name: 'ironDagger' },
   },
   drops: [
     { name: 'coin', amount: 1, chance: 20 },
@@ -70,8 +70,8 @@ const hobgoblin = () => ({
   SPD: 1,
   chance: 1,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'goblinSpear' },
-    [wieldSlots.LEFTHAND]: { name: 'goblinShield' },
+    [slots.RIGHTHAND]: { name: 'goblinSpear' },
+    [slots.LEFTHAND]: { name: 'goblinShield' },
   },
   defeatedRaces: [
     { name: 'Human', amount: 50 },

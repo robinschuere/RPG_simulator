@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const ironDagger = () => ({
   name: `Iron dagger`,
   description: 'A dagger made from iron',
-  wieldSlot: [wieldSlots.RIGHTHAND],
+  wieldSlot: [slots.RIGHTHAND],
   stackable: false,
   type: itemTypes.physical,
   bonus: 1,

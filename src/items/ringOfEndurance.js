@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const ringOfEndurance = () => ({
   name: `Ring of Endurance`,
   description: 'A rare ring made by the most brilliant of Dwarfs.',
-  wieldSlot: [wieldSlots.RIGHTRING, wieldSlots.LEFTRING],
+  wieldSlot: [slots.RIGHTRING, slots.LEFTRING],
   stackable: false,
   type: itemTypes.physicalDefensive,
   bonus: 25,

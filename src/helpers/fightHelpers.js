@@ -1,7 +1,7 @@
 const {
   itemTypes,
   attackTypes,
-  lists: { attack },
+  options: { attack },
 } = require('../constants');
 const { systemMessage } = require('./messages');
 const { optionAction } = require('./promptActions');
@@ -86,9 +86,10 @@ const doAttack = (att, def) => {
   }
 };
 
-const getDamage = async (requester) => {
+const getDamage = async (requester, { auto = false }) => {
   if (requester.characterAttack && !requester.auto) {
-    const option = await optionAction('What do you do?', attack);
+    const options = auto ? [...attack, { key: 'A', value: 'Auto-attack' }] : attack;
+    const option = await optionAction('What do you do?', options);
     switch (option.key) {
       case 'A':
         requester.auto = true;

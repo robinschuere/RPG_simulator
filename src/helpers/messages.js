@@ -18,8 +18,8 @@ const npcMessage = (narrator, message) => {
   console.log(`${narrator}: ${message}`.blue);
 };
 
-const characterMessage = (message) => {
-  console.log(`${message}`.white);
+const characterMessage = (character, message) => {
+  console.log(`${character.name}: ${message}`.white);
 };
 
 module.exports = {

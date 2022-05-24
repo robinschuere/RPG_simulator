@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const helmetOfRokusho = () => ({
   name: `Rokusho's helmet`,
   description: 'An ornate helmet engraved with the Sigil of house Ezom',
-  wieldSlot: [wieldSlots.HEAD],
+  wieldSlot: [slots.HEAD],
   stackable: false,
   type: itemTypes.arcaneDefensive,
   bonus: 50,

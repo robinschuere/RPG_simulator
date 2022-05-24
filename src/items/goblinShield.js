@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const goblinShield = () => ({
   name: `Goblin Shield`,
   description: 'A goblin shield made out of wood and nails',
-  wieldSlot: [wieldSlots.LEFTHAND],
+  wieldSlot: [slots.LEFTHAND],
   stackable: false,
   type: itemTypes.physicalDefensive,
   bonus: 10,

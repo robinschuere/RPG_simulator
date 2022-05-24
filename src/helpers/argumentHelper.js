@@ -1,19 +1,27 @@
 const argumentTranslator = (args) => {
   const variables = {};
-  const acceptedVariables = ['stall', 'levelboost'];
-  const numberArguments = ['stall', 'levelboost'];
+  const acceptedVariables = [
+    '--stall', '-s', 
+    '--no-clear', '-c', 
+    '--help', '-h',
+    '--auto', '-a',
+  ];
 
   args.forEach((f) => {
     const chars = f.split('=');
-    if (chars.length === 2) {
-      if (acceptedVariables.includes(chars[0])) {
-        const isNumber = numberArguments.includes(chars[0]);
-        variables[chars[0]] = isNumber ? parseInt(chars[1], 10) : chars[1];
+    if (acceptedVariables.includes(f)) {
+      if (['--stall', '-s'].includes(f)) {
+        variables.stall = 0.1;
       }
-    } else {
-      if (acceptedVariables.includes(f)) {
-        variables[f] = true;
+      if (['--no-clear', '-c'].includes(f)) {
+        variables.doNotCleanConsole = true;
       }
+      if (['--help', '-h'].includes(f)) {
+        variables.help = true;
+      } 
+      if (['--auto', '-a'].includes(f)) {
+        variables.auto = true;
+      } 
     }
   });
   return variables;

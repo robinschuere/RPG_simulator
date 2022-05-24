@@ -1,4 +1,4 @@
-const { wieldSlots } = require('../constants');
+const { slots } = require('../constants');
 
 const guard = () => ({
   name: 'Guard',
@@ -14,8 +14,8 @@ const guard = () => ({
   SPD: 5,
   chance: 70,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'ironShortSword' },
-    [wieldSlots.LEFTHAND]: { name: 'ironShield' },
+    [slots.RIGHTHAND]: { name: 'ironShortSword' },
+    [slots.LEFTHAND]: { name: 'ironShield' },
   },
   drops: [
     { name: 'coin', amount: 10, chance: 20 },
@@ -45,8 +45,8 @@ const dwarvenTrader = () => ({
   SPD: 1,
   chance: 15,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'ironMace' },
-    [wieldSlots.CAPE]: { name: 'traderCape' },
+    [slots.RIGHTHAND]: { name: 'ironMace' },
+    [slots.CAPE]: { name: 'traderCape' },
   },
   drops: [
     { name: 'coin', amount: 100, chance: 20 },
@@ -73,7 +73,7 @@ const slaveTrader = () => ({
   SPD: 15,
   chance: 1,
   gear: {
-    [wieldSlots.RIGHTHAND]: { name: 'wand' },
+    [slots.RIGHTHAND]: { name: 'wand' },
   },
   drops: [
     { name: 'coin', amount: 100, chance: 20 },

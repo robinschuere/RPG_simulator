@@ -12,7 +12,7 @@ const quitAction = async () => {
     type: 'input',
     name: 'quit',
     message:
-      'Are you sure you want to quit? Type [Y]es to stop the game. Any other character will resume the game.',
+      'Are you sure you want to quit? Type [Y]es to stop the game. Any other entry will resume the game.',
   });
   return ['Y', 'YES'].includes(response.quit.toUpperCase());
 };
@@ -26,11 +26,17 @@ const confirmAction = async (message = '') => {
   return ['', 'Y', 'YES'].includes(response.confirm.toUpperCase());
 };
 
-const freeAction = async (message = '', maxLength = 25) => {
+/**
+ * 
+ * @param {String} message the message that will be displayed
+ * @param {String} info 
+ * @returns {String}
+ */
+const freeAction = async (message = '', info = 'anything') => {
   const response = await prompt({
     type: 'input',
     name: 'free',
-    message: `${message}\n(type anything and press ENTER)`,
+    message: `${message ? `${message}\n`: ''}(type ${info} and press ENTER)`,
   });
   return response.free;
 };

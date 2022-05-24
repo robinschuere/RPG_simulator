@@ -1,5 +1,5 @@
-const { attackTypes, stats } = require('../constants');
-const { elevateCharacterValues } = require('../helpers/characterHelpers');
+const { attackTypes, statistics, fightStallTime } = require('../constants');
+const { elevateCharacterStatistics } = require('../helpers/characterHelpers');
 const { getCharacterStatistics } = require('../helpers/combatHelpers');
 const { getDamage } = require('../helpers/fightHelpers');
 const { getItem } = require('../helpers/itemHelpers');
@@ -85,8 +85,8 @@ const endFight = async (character, enemy, val) => {
     );
     arenaStatusMessage(`You receive ${enemy.experience} experience ...`);
 
-    await elevateCharacterValues(character, [
-      { statName: stats.EXP, value: enemy.experience },
+    await elevateCharacterStatistics(character, [
+      { statName: statistics.EXP, value: enemy.experience },
     ]);
   }
 };
@@ -112,7 +112,7 @@ const switchPlaces = (val) => {
   val.characterAttack = !val.characterAttack;
 };
 
-const runFight = async (character, enemy) => {
+const runFight = async (character, enemy, options) => {
   const characterValues = getCharacterStatistics(character);
   const enemyValues = getCharacterStatistics(enemy);
 
@@ -122,7 +122,7 @@ const runFight = async (character, enemy) => {
 
   const doNextAttack = async (val) => {
     getArenaStatus(val);
-    await staller(2);
+    await staller(options.stall || fightStallTime);
     const isFight = val.att.HP > 0 && val.def.HP > 0;
     if (!isFight) {
       await endFight(character, enemy, val);
@@ -138,7 +138,7 @@ const runFight = async (character, enemy) => {
     }`,
   );
   while (sequence) {
-    const damage = await getDamage(requester);
+    const damage = await getDamage(requester, options);
 
     switch (damage.type) {
       case attackTypes.dodged:

@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const ironShortSword = () => ({
   name: `Iron short sword`,
   description: 'A sword made from iron',
-  wieldSlot: [wieldSlots.RIGHTHAND],
+  wieldSlot: [slots.RIGHTHAND],
   stackable: false,
   type: itemTypes.physical,
   bonus: 3,

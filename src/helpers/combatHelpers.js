@@ -1,14 +1,14 @@
-const { wieldSlots, itemTypes } = require('../constants');
-const { raiseStat, getMaxHealth, getMaxMana } = require('./characterHelpers');
+const { slots, itemTypes } = require('../constants');
+const { raiseStatistic, getMaxHealth, getMaxMana } = require('./characterHelpers');
 const { getItem } = require('./itemHelpers');
 
 const heal = (character, amount) => {
   const max = getMaxHealth(character);
   const maximumToHeal = max - character.HP;
   if (maximumToHeal > amount) {
-    raiseStat(character, 'HP', amount);
+    raiseStatistic(character, 'HP', amount);
   } else {
-    raiseStat(character, 'HP', maximumToHeal);
+    raiseStatistic(character, 'HP', maximumToHeal);
   }
 };
 
@@ -80,14 +80,14 @@ const getCharacterStatistics = (character, enemy) => {
         });
       });
 
-  Object.keys(wieldSlots).forEach((key) => {
+  Object.keys(slots).forEach((key) => {
     if (character.gear[key]) {
       addGearStatistics(character, values, character.gear[key].name);
     }
   });
 
-  const rightHandItem = character.gear[wieldSlots.RIGHTHAND]
-    ? getItem(character, character.gear[wieldSlots.RIGHTHAND].name)
+  const rightHandItem = character.gear[slots.RIGHTHAND]
+    ? getItem(character, character.gear[slots.RIGHTHAND].name)
     : undefined;
 
   return {

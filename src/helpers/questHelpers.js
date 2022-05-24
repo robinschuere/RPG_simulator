@@ -1,3 +1,4 @@
+const { questStages, quests } = require('../constants');
 const { addDropToInventory } = require('./inventoryHelpers');
 
 const startQuest = (character, quest) => {
@@ -8,12 +9,12 @@ const startQuest = (character, quest) => {
 const completeQuest = async (character, name) => {
   character.quests[name] = { stage: questStages.completed };
   const quest = quests[name];
-  let statsMessage = '';
+  let statisticsMessage = '';
   let itemMessage = '';
   if (quest) {
-    Object.keys(quest.stats).forEach(async (key) => {
-      character[key] += quest.stats[key];
-      statsMessage += `\n${key} elevated by ${quest.stats[key]}`;
+    Object.keys(quest.statistics).forEach(async (key) => {
+      character[key] += quest.statistics[key];
+      statisticsMessage += `\n${key} elevated by ${quest.statistics[key]}`;
     });
     quest.items.forEach((item) => {
       addDropToInventory(character, item);
@@ -22,7 +23,7 @@ const completeQuest = async (character, name) => {
   }
   const message = infoCard.questMessage
     .replace('[NAME]', quest.name)
-    .replace('[STATS]', statsMessage || '')
+    .replace('[STATISTICS]', statisticsMessage || '')
     .replace('[ITEMS]', itemMessage || '');
   console.log(message);
   return character;

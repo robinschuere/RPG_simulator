@@ -1,10 +1,10 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const amuletOfDamnation = () => ({
   name: `Amulet of Damnation`,
   description:
     'An unnatural black light seems to eminate from the heart of the crystal. It gives me the creeps.',
-  wieldSlot: [wieldSlots.NECK],
+  wieldSlot: [slots.NECK],
   stackable: false,
   type: [
     itemTypes.arcane,

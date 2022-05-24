@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const oldRelic = () => ({
   name: `Old Relic`,
   description: 'A unique ring made from an unknown substance.',
-  wieldSlot: [wieldSlots.RIGHTRING, wieldSlots.LEFTRING],
+  wieldSlot: [slots.RIGHTRING, slots.LEFTRING],
   stackable: false,
   type: [itemTypes.arcaneDefensive, itemTypes.physicalDefensive],
   bonus: 15,

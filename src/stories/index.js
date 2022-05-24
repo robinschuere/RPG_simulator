@@ -1,3 +1,4 @@
+const { options, storyStallTime } = require('../constants');
 const {
   systemMessage,
   characterMessage,
@@ -9,7 +10,28 @@ const stories = {
   introduction: require('./introduction'),
 };
 
-const runStory = async (character, { stall = 3 }) => {
+const printStoryMessage = (character, value, options) => {
+  if (value.narrator === 'System') {
+    systemMessage(value.message);
+  } else if (value.narrator === 'you') {
+    characterMessage(character, value.message);
+  } else {
+    npcMessage(value.narrator, value.message);
+  }
+}
+
+const printCustomStoryMessage = (character, value, options) => {
+  if (value.narrator === 'System') {
+    systemMessage(value.messageWithParams(character));
+  } else if (value.narrator === 'you') {
+    characterMessage(character, value.messageWithParams(character));
+  } else {
+    npcMessage(value.narrator, value.messageWithParams(character)); 
+  }
+}
+
+
+const runStory = async (character, { stall, doNotCleanConsole }) => {
   const story = stories[character.stage];
   if (!story) {
     throw new Error('This story is not written yet!');
@@ -17,20 +39,19 @@ const runStory = async (character, { stall = 3 }) => {
   for (let index = 0; index < story.length; index++) {
     const val = story[index];
     if (val.message) {
-      if (val.narrator === 'System') systemMessage(val.message);
-      else if (val.narrator === 'you') characterMessage(val.message);
-      else npcMessage(val.narrator, val.message);
-      await (val.stall ? staller(val.stall) : staller(stall));
+      printStoryMessage(character, val, options);
+      await staller(stall || storyStallTime);
     } else if (val.messageWithParams) {
-      if (val.narrator === 'System')
-        systemMessage(val.messageWithParams(character));
-      else if (val.narrator === 'you')
-        characterMessage(val.messageWithParams(character));
-      else npcMessage(val.narrator, val.messageWithParams(character));
-      await (val.stall ? staller(val.stall) : staller(stall));
+      printCustomStoryMessage(character, val, options);
+      await staller(stall || storyStallTime);
+    } else if (val.stall) {
+      await staller(stall || val.stall);
     } else if (val.action) {
-      await val.action(character);
+      await val.action(character, options);
     }
+  }
+  if (!doNotCleanConsole) {
+    console.clear();
   }
   return character;
 };

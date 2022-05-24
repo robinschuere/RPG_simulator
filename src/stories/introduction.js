@@ -7,48 +7,106 @@ const {
   addDropToInventory,
   swapItemFromInventoryToWieldingSlot,
 } = require('../helpers/inventoryHelpers');
-const { lists, wieldSlots, quests, stats } = require('../constants');
-const { elevateCharacterValues } = require('../helpers/characterHelpers');
+const { options, slots, quests, statistics } = require('../constants');
+const { elevateCharacterStatistics, getGenderLabel } = require('../helpers/characterHelpers');
 const { getCharacterCard } = require('../helpers/textHelpers');
+const { startQuest } = require('../helpers/questHelpers');
+const { saveCharacter } = require('../helpers/fileHelpers');
 
-const changeCharacterParameter = async (character, parameter, msg) => {
-  const r = await freeAction(msg);
+const elevation = [
+  {
+    key: 'A',
+    raisedStatistics: {
+      HEA: 3,
+      STR: 3,
+      WIS: 3,
+      DEX: 3,
+      INT: 3,
+      DEF: 3,
+      ACC: 3,
+      SPD: 3,
+    },
+  },
+  {
+    key: 'B',
+    raisedStatistics: {
+      HEA: 5,
+      STR: 1,
+      WIS: 5,
+      DEX: 1,
+      INT: 5,
+      DEF: 1,
+      ACC: 5,
+      SPD: 1,
+    },
+  },
+  {
+    key: 'C',
+    raisedStatistics: {
+      HEA: 5,
+      STR: 5,
+      WIS: 5,
+      DEX: 1,
+      INT: 1,
+      DEF: 5,
+      ACC: 1,
+      SPD: 1,
+    },
+  },
+  {
+    key: 'E',
+    raisedStatistics: {
+      HEA: 1,
+      STR: 5,
+      WIS: 1,
+      DEX: 5,
+      INT: 1,
+      DEF: 1,
+      ACC: 5,
+      SPD: 5,
+    },
+  },
+];
+
+const changeCharacterParameter = async (character, parameter, msg, info) => {
+  const r = await freeAction(msg, info);
   character[parameter] = r;
   return character;
 };
 
 const changeGender = async (character) => {
-  const r = await optionAction('', lists.gender);
-  character.gender = r;
+  const r = await optionAction('', options.gender);
+  character.gender = r.key;
   return character;
 };
 
 const changeRace = async (character) => {
-  const r = await optionAction('', lists.race);
-  character.race = lists.race.find((f) => f.key === r).value;
+  const r = await optionAction('', options.race);
+  character.race = r.key;
   return character;
 };
 
-const changeName = (character) => changeCharacterParameter(character, 'name');
-const changeWorld = (character) => changeCharacterParameter(character, 'world');
+const changeName = (character) => changeCharacterParameter(character, 'name', '', 'your name');
+const changeWorld = (character) => changeCharacterParameter(character, 'world', '', 'your world');
+
 
 const complete = async (character) => {
   const c = await confirmAction();
   if (c) {
-    const race = lists.race.find((f) => f.key === character.race);
+    const race = options.race.find((f) => f.key === character.race);
     character.stage = 'idle';
     character.location = 'wizardTower';
-    character.affinities = [...race.affinities];
-    await elevateCharacterValues(character, [
-      { statName: stats.HEA, value: race.raisedStats.HEA },
-      { statName: stats.STR, value: race.raisedStats.STR },
-      { statName: stats.WIS, value: race.raisedStats.WIS },
-      { statName: stats.INT, value: race.raisedStats.INT },
-      { statName: stats.DEX, value: race.raisedStats.DEX },
-      { statName: stats.DEF, value: race.raisedStats.DEF },
-      { statName: stats.ACC, value: race.raisedStats.ACC },
-      { statName: stats.SPD, value: race.raisedStats.SPD },
-      { statName: stats.EXP, value: 50 },
+    const raceElevationStatistics = elevation.find(s => s.key === character.race);
+    await elevateCharacterStatistics(character, [
+      { statName: statistics.HEA, value: raceElevationStatistics.raisedStatistics.HEA },
+      { statName: statistics.STR, value: raceElevationStatistics.raisedStatistics.STR },
+      { statName: statistics.WIS, value: raceElevationStatistics.raisedStatistics.WIS },
+      { statName: statistics.INT, value: raceElevationStatistics.raisedStatistics.INT },
+      { statName: statistics.DEX, value: raceElevationStatistics.raisedStatistics.DEX },
+      { statName: statistics.DEF, value: raceElevationStatistics.raisedStatistics.DEF },
+      { statName: statistics.ACC, value: raceElevationStatistics.raisedStatistics.ACC },
+      { statName: statistics.SPD, value: raceElevationStatistics.raisedStatistics.SPD },
+      { statName: statistics.EXP, value: 50 },
     ]);
 
     startQuest(character, quests.aFirstEncounter);
@@ -79,19 +137,19 @@ const learnSpell = (character) => {
   return character;
 };
 
-const giveEquipment = (c) => {
-  addDropToInventory(c, { name: 'coin', amount: 5 });
-  const shortSword = addDropToInventory(c, {
+const giveEquipment = (character) => {
+  addDropToInventory(character, { name: 'coin', amount: 5 });
+  const shortSword = addDropToInventory(character, {
     name: 'ironShortSword',
     amount: 1,
   });
-  const tunic = addDropToInventory(c, { name: 'tunic', amount: 1 });
-  const pants = addDropToInventory(c, { name: 'leatherPants', amount: 1 });
-  const boots = addDropToInventory(c, { name: 'leatherBoots', amount: 1 });
-  swapItemFromInventoryToWieldingSlot(c, shortSword, wieldSlots.RIGHTHAND);
-  swapItemFromInventoryToWieldingSlot(c, tunic, wieldSlots.BODY);
-  swapItemFromInventoryToWieldingSlot(c, pants, wieldSlots.LEGS);
-  swapItemFromInventoryToWieldingSlot(c, boots, wieldSlots.FEET);
+  const tunic = addDropToInventory(character, { name: 'tunic', amount: 1 });
+  const pants = addDropToInventory(character, { name: 'leatherPants', amount: 1 });
+  const boots = addDropToInventory(character, { name: 'leatherBoots', amount: 1 });
+  swapItemFromInventoryToWieldingSlot(character, shortSword, slots.RIGHTHAND);
+  swapItemFromInventoryToWieldingSlot(character, tunic, slots.BODY);
+  swapItemFromInventoryToWieldingSlot(character, pants, slots.LEGS);
+  swapItemFromInventoryToWieldingSlot(character, boots, slots.FEET);
 };
 
 const save = async (character) => {
@@ -103,26 +161,6 @@ const save = async (character) => {
 };
 
 const story = [
-  {
-    narrator: 'System',
-    message: `
-    Welcome to the console game of Kuramzo.
-
-    This game was written as a RPG side-project by Robin Schuerewegen.
-    Everything found in the code is by all means written and created with a fun factor in mind.
-
-    Whenever a problem does occur, remember that the product is by no means a completed product.
-
-    Some small things to take into account.
-    - Red information is a system message. Like feelings, etc ....
-    - green information is NPC dialog
-    - blue information is dialog provided by your character
-    - cheesy dialog has a high chance of occurrence
-
-    There is one more thing to say and that is, do enjoy!
-  `,
-  },
-  { stall: 5 },
   {
     narrator: 'System',
     message:

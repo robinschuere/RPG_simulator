@@ -1,13 +1,13 @@
 const {
   infoCard: { general, levels, gear },
-  wieldSlots,
+  slots,
 } = require('../constants');
-const { getGenderLabel } = require('./characterHelpers');
+const { getGenderLabel, getRaceLabel } = require('./characterHelpers');
 const { getItem } = require('./itemHelpers');
 
 const getGear = (character) => {
   let gearMessage = gear;
-  Object.keys(wieldSlots).forEach((key) => {
+  Object.keys(slots).forEach((key) => {
     if (character.gear[key]) {
       const item = getItem(character, character.gear[key].name);
       gearMessage = gearMessage.replace(`[${key}]`, item.name);
@@ -42,7 +42,7 @@ const getLevels = (character) => {
 const getCharacterCard = (character, withLevels, withGear, withItems) => {
   const card = general
     .replace('[NAME]', character.name)
-    .replace('[RACE]', character.race)
+    .replace('[RACE]', getRaceLabel(character.race))
     .replace('[SEX]', getGenderLabel(character))
     .replace('[WORLD]', `${character.world}`)
     .replace('[LVL]', `${character.LVL}`)

@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const leatherPants = () => ({
   name: `Leather pants`,
   description: 'Pants made from leather',
-  wieldSlot: [wieldSlots.LEGS],
+  wieldSlot: [slots.LEGS],
   stackable: false,
   type: itemTypes.physicalDefensive,
   bonus: 2,

@@ -1,9 +1,9 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const tunic = () => ({
   name: `Tunic`,
   description: 'A tunic made from soft wool',
-  wieldSlot: [wieldSlots.BODY],
+  wieldSlot: [slots.BODY],
   stackable: false,
   type: itemTypes.physicalDefensive,
   bonus: 2,

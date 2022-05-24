@@ -1,10 +1,10 @@
-const { itemTypes, wieldSlots } = require('../constants');
+const { itemTypes, slots } = require('../constants');
 
 const bowOfDarkness = () => ({
   name: 'Bow of Darkness',
   description:
     'The souls that this bow has consumed are trying to break your will.',
-  wieldSlot: [wieldSlots.RIGHTHAND],
+  wieldSlot: [slots.RIGHTHAND],
   stackable: false,
   type: itemTypes.arcane,
   bonus: 95,

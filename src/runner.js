@@ -2,7 +2,7 @@ require('colors');
 const { runStory } = require('./stories');
 const { runIdle } = require('./idle');
 const { runTraining } = require('./training');
-const { stages } = require('./constants');
+const { characterStages, helpPage, stallTime } = require('./constants');
 const { getBeginner } = require('./helpers/characterHelpers');
 const { argumentTranslator } = require('./helpers/argumentHelper');
 const {
@@ -21,20 +21,24 @@ const openOrCreateCharacter = async () => {
 
 const runner = async (args) => {
   let running = true;
-  const givenArguments = argumentTranslator(args);
+  const options = argumentTranslator(args);
+  if (options.help) {
+    console.log(helpPage.blue)
+    return;
+  }
 
   const character = await openOrCreateCharacter();
   const stop = () => (running = false);
   while (running) {
     switch (character.stage) {
-      case stages.introduction:
-        await runStory(character, givenArguments);
+      case characterStages.introduction:
+        await runStory(character, options);
         break;
-      case stages.idle:
-        await runIdle(character, stop, givenArguments);
+      case characterStages.idle:
+        await runIdle(character, stop, options);
         break;
-      case stages.training:
-        await runTraining(character, givenArguments);
+      case characterStages.training:
+        await runTraining(character, options);
         break;
       default:
         break;

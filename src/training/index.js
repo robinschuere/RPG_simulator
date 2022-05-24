@@ -1,10 +1,10 @@
-const { stages } = require('../constants');
+const { characterStages } = require('../constants');
 const { locationAndEnemies } = require('../enemies');
 const { runFight } = require('../fight');
 const { defineEnemy } = require('../helpers/combatHelpers');
 const { confirmAction } = require('../helpers/promptActions');
 
-const runTraining = async (character) => {
+const runTraining = async (character, options) => {
   const locationEnemies = locationAndEnemies[character.location];
   if (!locationEnemies) {
     throw new Error(
@@ -12,12 +12,12 @@ const runTraining = async (character) => {
     );
   }
   const enemy = defineEnemy(locationEnemies);
-  await runFight(character, enemy);
+  await runFight(character, enemy, options);
   const continueTraining = await confirmAction(
     'Do you want to venture deeper into the woods?',
   );
   if (!continueTraining) {
-    character.stage = stages.idle;
+    character.stage = characterStages.idle;
   }
 };
 
