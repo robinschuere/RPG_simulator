@@ -1,33 +1,29 @@
 const { v4: uuid } = require('uuid');
-const { getItem } = require('./itemHelpers');
+const { getItem } = require('../items');
 
-const addInventoryItem = (character, drop) => {
-  const inventoryItem = { key: uuid(), ...drop };
+const addInventoryItem = (character, itemId, amount) => {
+  const inventoryItem = { key: uuid(), itemId, amount };
   character.inventory.push(inventoryItem);
   return inventoryItem;
 };
 
-const addDropToInventory = (character, drop) => {
-  const item = getItem(character, drop.name);
+const addDropToInventory = (character, itemId, amount) => {
+  const item = getItem(itemId);
   if (item.stackable) {
     // find the inventory if it is stackable and add the value
-    const inventoryItem = character.inventory.find((f) => f.name === drop.name);
+    const inventoryItem = character.inventory.find((f) => f.itemId === itemId);
     if (inventoryItem) {
-      inventoryItem.amount += drop.amount;
+      inventoryItem.amount += amount;
       return inventoryItem;
     }
   }
-  return addInventoryItem(character, drop);
+  return addInventoryItem(character, itemId, amount);
 };
 
-const swapItemFromInventoryToWieldingSlot = (
-  character,
-  inventoryItem,
-  slot,
-) => {
-  const toSwap = getItem(character, inventoryItem.name);
+const swapInventoryToSlot = (character, inventoryItem, slot) => {
+  const toSwap = getItem(inventoryItem.itemId);
 
-  if (!toSwap.wieldSlot.includes(slot)) {
+  if (!toSwap.slot.includes(slot)) {
     console.log('You cannot wield that item in that slot');
     return;
   }
@@ -36,25 +32,12 @@ const swapItemFromInventoryToWieldingSlot = (
     1,
   );
   if (character.gear[slot]) {
-    character.inventory.push({ ...character.gear[slot] });
+    addDropToInventory(character, character.gear[slot], 1);
   }
-  character.gear[slot] = { ...inventoryItem };
-};
-
-const sellInventoryItem = (character, key) => {
-  const inventoryItemIndex = character.inventory.findIndex(
-    (f) => f.key === key,
-  );
-  const item = getItem(character, character.inventory[inventoryItemIndex].name);
-
-  const getCoinValue = character.inventory.find((f) => f.name === 'coin');
-  getCoinValue.amount += item.worth;
-
-  character.inventory.splice(inventoryItemIndex, 1);
+  character.gear[slot] = inventoryItem.itemId;
 };
 
 module.exports = {
   addDropToInventory,
-  sellInventoryItem,
-  swapItemFromInventoryToWieldingSlot,
+  swapInventoryToSlot,
 };

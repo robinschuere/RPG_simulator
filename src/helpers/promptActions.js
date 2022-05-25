@@ -63,9 +63,30 @@ const optionAction = async (message, options) => {
   return option || optionAction(message, options);
 };
 
+const multiAction = async (message, options, amount) => {
+  const mappedOptions = options
+    .map((f) => `[${translateKey(f.key)}]: ${f.description || f.value}`)
+    .join('\n');
+  const response = await prompt({
+    type: 'input',
+    name: 'options',
+    message: `${message}\n${mappedOptions}\n(select ${amount} of options to continue)`,
+  });
+  const selectedValues = response.options
+    .toUpperCase()
+    .split('')
+    .map((s) => options.find((o) => o.key === s))
+    .filter(Boolean);
+  if (selectedValues.length === amount) {
+    return selectedValues;
+  }
+  return multiAction(message, options, amount);
+};
+
 module.exports = {
   quitAction,
   confirmAction,
   freeAction,
   optionAction,
+  multiAction,
 };

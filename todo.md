@@ -1,9 +1,11 @@
 # ToDo
 
-- [X] Fix the characterCard
+- [x] Fix the characterCard to show all values
 
-- [ ] Correctly implement the clean console (and dev option)
+- [x] Correctly implement the clean console (and dev option)
 
 - [ ] running away is not correct yet
 
-- [ ] write deathOffice story
+- [x] write death logic
+
+- [x] save defeatedRaces

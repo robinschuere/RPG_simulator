@@ -5,15 +5,22 @@ const {
 } = require('../helpers/promptActions');
 const {
   addDropToInventory,
-  swapItemFromInventoryToWieldingSlot,
+  swapInventoryToSlot,
 } = require('../helpers/inventoryHelpers');
-const { options, slots, statistics, narrators } = require('../constants');
+const {
+  options,
+  slots,
+  characterStatistics,
+  narrators,
+  characterStages,
+} = require('../constants');
 const {
   elevateCharacterStatistics,
   getGenderLabel,
 } = require('../helpers/characterHelpers');
 const { getCharacterCard } = require('../helpers/textHelpers');
 const { saveCharacter } = require('../helpers/fileHelpers');
+const { getItem } = require('../items');
 
 const elevation = [
   {
@@ -56,7 +63,7 @@ const elevation = [
     },
   },
   {
-    key: 'E',
+    key: 'D',
     raisedStatistics: {
       HEA: 1,
       STR: 5,
@@ -97,45 +104,45 @@ const complete = async (character) => {
   const confirmed = await confirmAction();
   if (confirmed) {
     const race = options.race.find((f) => f.key === character.race);
-    character.stage = 'idle';
-    character.location = 'wizardTower';
+    character.stage = characterStages.idle;
+    character.location = '000001';
     const raceElevationStatistics = elevation.find(
       (s) => s.key === character.race,
     );
     await elevateCharacterStatistics(character, [
       {
-        statName: statistics.HEA,
+        statName: characterStatistics.HEA,
         value: raceElevationStatistics.raisedStatistics.HEA,
       },
       {
-        statName: statistics.STR,
+        statName: characterStatistics.STR,
         value: raceElevationStatistics.raisedStatistics.STR,
       },
       {
-        statName: statistics.WIS,
+        statName: characterStatistics.WIS,
         value: raceElevationStatistics.raisedStatistics.WIS,
       },
       {
-        statName: statistics.INT,
+        statName: characterStatistics.INT,
         value: raceElevationStatistics.raisedStatistics.INT,
       },
       {
-        statName: statistics.DEX,
+        statName: characterStatistics.DEX,
         value: raceElevationStatistics.raisedStatistics.DEX,
       },
       {
-        statName: statistics.DEF,
+        statName: characterStatistics.DEF,
         value: raceElevationStatistics.raisedStatistics.DEF,
       },
       {
-        statName: statistics.ACC,
+        statName: characterStatistics.ACC,
         value: raceElevationStatistics.raisedStatistics.ACC,
       },
       {
-        statName: statistics.SPD,
+        statName: characterStatistics.SPD,
         value: raceElevationStatistics.raisedStatistics.SPD,
       },
-      { statName: statistics.EXP, value: 50 },
+      { statName: characterStatistics.EXP, value: 50 },
     ]);
 
     return character;
@@ -156,33 +163,17 @@ const complete = async (character) => {
   }
 };
 
-const learnSpell = (character) => {
-  character.magicalProperties.push({
-    name: 'checkMyStatzz',
-    lvl: 1,
-  });
-  return character;
-};
-
 const giveEquipment = (character) => {
-  addDropToInventory(character, { name: 'coin', amount: 5 });
-  const shortSword = addDropToInventory(character, {
-    name: 'ironShortSword',
-    amount: 1,
-  });
-  const tunic = addDropToInventory(character, { name: 'tunic', amount: 1 });
-  const pants = addDropToInventory(character, {
-    name: 'leatherPants',
-    amount: 1,
-  });
-  const boots = addDropToInventory(character, {
-    name: 'leatherBoots',
-    amount: 1,
-  });
-  swapItemFromInventoryToWieldingSlot(character, shortSword, slots.RIGHTHAND);
-  swapItemFromInventoryToWieldingSlot(character, tunic, slots.BODY);
-  swapItemFromInventoryToWieldingSlot(character, pants, slots.LEGS);
-  swapItemFromInventoryToWieldingSlot(character, boots, slots.FEET);
+  addDropToInventory(character, '000003', 5);
+  const inventorySword = addDropToInventory(character, '000002', 1);
+  const inventoryBoots = addDropToInventory(character, '000004', 1);
+  const inventoryPants = addDropToInventory(character, '000005', 1);
+  const inventoryTunic = addDropToInventory(character, '000006', 1);
+
+  swapInventoryToSlot(character, inventorySword, slots.RIGHTHAND);
+  swapInventoryToSlot(character, inventoryTunic, slots.BODY);
+  swapInventoryToSlot(character, inventoryPants, slots.LEGS);
+  swapInventoryToSlot(character, inventoryBoots, slots.FEET);
 };
 
 const save = async (character) => {
@@ -356,7 +347,6 @@ const story = [
     narrator: narrators.SYSTEM,
     message: 'The man teaches you the spell "Check My statzz".',
   },
-  { action: learnSpell },
   { action: getCharacterCard },
   {
     narrator: narrators.SYSTEM,

@@ -1,10 +1,10 @@
 const { slots, itemTypes, masteryThresholds } = require('../constants');
+const { getItem } = require('../items');
 const {
   raiseStatistic,
   getMaxHealth,
   getMaxMana,
 } = require('./characterHelpers');
-const { getItem } = require('./itemHelpers');
 
 const heal = (character, amount) => {
   const max = getMaxHealth(character);
@@ -24,8 +24,8 @@ const fullHeal = (character) => {
   return character;
 };
 
-const addGearStatistics = (character, values, name) => {
-  const item = getItem(character, name);
+const addGearStatistics = (values, itemId) => {
+  const item = getItem(itemId);
 
   values.HEA += item.HEA;
   values.STR += item.STR;
@@ -40,16 +40,16 @@ const addGearStatistics = (character, values, name) => {
   types.forEach((type) => {
     switch (type) {
       case itemTypes.physical:
-        values.STR += item.bonus;
+        values.STR += item.bonus || 0;
         break;
       case itemTypes.physicalDefensive:
-        values.DEF += item.bonus;
+        values.DEF += item.bonus || 0;
         break;
       case itemTypes.arcane:
-        values.INT += item.bonus;
+        values.INT += item.bonus || 0;
         break;
       case itemTypes.arcaneDefensive:
-        values.WIS += item.bonus;
+        values.WIS += item.bonus || 0;
         break;
     }
   });
@@ -67,31 +67,30 @@ const getCharacterStatistics = (character, enemy) => {
     SPD: character.SPD,
   };
 
-  (character.defeatedRaces ||
-    [])
-      .filter((f) => f.name === enemy.race)
-      .forEach(({ amount }) => {
-        [10, 50, 100, 500, 1000, 10000, 100000].forEach((step) => {
-          if (amount > step) {
-            values.STR += masteryThresholds[step].STR || 0;
-            values.DEF += masteryThresholds[step].DEF || 0;
-            values.WIS += masteryThresholds[step].WIS || 0;
-            values.DEX += masteryThresholds[step].DEX || 0;
-            values.INT += masteryThresholds[step].INT || 0;
-            values.ACC += masteryThresholds[step].ACC || 0;
-            values.SPD += masteryThresholds[step].SPD || 0;
-          }
-        });
+  (character.defeatedRaces || [])
+    .filter((f) => f.name === enemy.race)
+    .forEach(({ amount }) => {
+      [10, 50, 100, 500, 1000, 10000, 100000].forEach((step) => {
+        if (amount >= step) {
+          values.STR += masteryThresholds[step].STR || 0;
+          values.DEF += masteryThresholds[step].DEF || 0;
+          values.WIS += masteryThresholds[step].WIS || 0;
+          values.DEX += masteryThresholds[step].DEX || 0;
+          values.INT += masteryThresholds[step].INT || 0;
+          values.ACC += masteryThresholds[step].ACC || 0;
+          values.SPD += masteryThresholds[step].SPD || 0;
+        }
       });
+    });
 
   Object.keys(slots).forEach((key) => {
     if (character.gear[key]) {
-      addGearStatistics(character, values, character.gear[key].name);
+      addGearStatistics(values, character.gear[key]);
     }
   });
 
   const rightHandItem = character.gear[slots.RIGHTHAND]
-    ? getItem(character, character.gear[slots.RIGHTHAND].name)
+    ? getItem(character.gear[slots.RIGHTHAND])
     : undefined;
 
   return {
@@ -117,19 +116,26 @@ const getCharacterStatistics = (character, enemy) => {
   };
 };
 
-const defineEnemy = (enemies) => {
+const defineEnemy = (locationMonsters) => {
   const chanceCounter = {};
-  Object.keys(enemies).map((k) => {
+  locationMonsters.map(({ id, chance }) => {
     const firstKey = Object.keys(chanceCounter).length;
-    for (let i = 0; i < enemies[k]().chance; i++) {
+    for (let i = 0; i < chance; i++) {
       const key = firstKey + i;
-      chanceCounter[key] = k;
+      chanceCounter[key] = id;
     }
   });
   const randomizer = Math.floor(
     Math.random() * Object.keys(chanceCounter).length,
   );
-  return enemies[chanceCounter[randomizer]]();
+  const enemy = locationMonsters.find(
+    (s) => s.id === chanceCounter[randomizer],
+  );
+  return {
+    ...enemy.monster,
+    gear: enemy.gear,
+    drops: enemy.drops,
+  };
 };
 
 module.exports = {

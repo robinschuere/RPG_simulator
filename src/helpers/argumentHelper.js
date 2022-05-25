@@ -9,6 +9,8 @@ const argumentTranslator = (args) => {
     '-h',
     '--auto',
     '-a',
+    '--raise',
+    '-r',
   ];
 
   args.forEach((f) => {
@@ -26,6 +28,9 @@ const argumentTranslator = (args) => {
       if (['--auto', '-a'].includes(f)) {
         variables.auto = true;
       }
+      if (['--raise', '-r'].includes(f)) {
+        variables.raiseStatistics = 10;
+      }
     }
   });
   return {
@@ -33,6 +38,7 @@ const argumentTranslator = (args) => {
     doNotCleanConsole: false,
     help: false,
     auto: false,
+    raise: 0,
     ...variables,
   };
 };

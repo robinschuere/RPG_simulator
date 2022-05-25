@@ -1,26 +1,16 @@
 const { fullHeal } = require('../helpers/combatHelpers');
+const { getLocation } = require('../locations');
 
-const idle = {
-  name: 'the Wizard Tower',
+const location = () => ({
+  ...getLocation('000001'),
   options: [
     {
       key: 'A',
-      value: 'Go see Mizgog',
-      action: (character) => (character.location = 'mizgogOfficeDoor'),
+      value: 'Go to the training grounds',
+      action: (character) => (character.location = '000002'),
     },
     {
       key: 'B',
-      value: 'Go see the trader',
-      action: (character) => (character.location = 'wizardTowerGeneralStore'),
-    },
-    {
-      key: 'C',
-      value: 'Go to the training grounds',
-      action: (character) =>
-        (character.location = 'wizardTowerTrainingGrounds'),
-    },
-    {
-      key: 'D',
       value: 'Check the statue',
       action: (c) => {
         fullHeal(c);
@@ -31,6 +21,6 @@ const idle = {
       },
     },
   ],
-};
+});
 
-module.exports = idle;
+module.exports = location;

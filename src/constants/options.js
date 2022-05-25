@@ -53,17 +53,20 @@ module.exports = {
     {
       key: 'A',
       value: 'Human',
+      selectable: true,
     },
     {
       key: 'B',
       value: 'Elf',
+      selectable: true,
     },
     {
       key: 'C',
       value: 'Dwarf',
+      selectable: true,
     },
     {
-      key: 'E',
+      key: 'D',
       value: 'Dauntir',
     },
   ],

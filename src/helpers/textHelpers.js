@@ -1,6 +1,11 @@
-const { slots, statistics, cardWidth } = require('../constants');
+const {
+  slots,
+  characterStatistics,
+  cardWidth,
+  masteryThresholds,
+} = require('../constants');
+const { getItem } = require('../items');
 const { getGenderLabel, getRaceLabel } = require('./characterHelpers');
-const { getItem } = require('./itemHelpers');
 
 const getCharacterStat = (character) => (statistic) => {
   return `${character[statistic]}`.padStart(3, '0');
@@ -14,18 +19,18 @@ const getCharacterCard = (character, withLevels, withGear, withItems) => {
         { text: `LEVELS` },
         { text: `----------` },
         {
-          text: `HEA: [${short(statistics.HEA)}]   STR: [${short(
-            statistics.STR,
-          )}]   WIS: [${short(statistics.WIS)}]`,
+          text: `HEA: [${short(characterStatistics.HEA)}]   STR: [${short(
+            characterStatistics.STR,
+          )}]   WIS: [${short(characterStatistics.WIS)}]`,
         },
         {
-          text: `DEX: [${short(statistics.DEX)}]   INT: [${short(
-            statistics.INT,
-          )}]   DEF: [${short(statistics.DEF)}]`,
+          text: `DEX: [${short(characterStatistics.DEX)}]   INT: [${short(
+            characterStatistics.INT,
+          )}]   DEF: [${short(characterStatistics.DEF)}]`,
         },
         {
-          text: `ACC: [${short(statistics.ACC)}]   SPD: [${short(
-            statistics.SPD,
+          text: `ACC: [${short(characterStatistics.ACC)}]   SPD: [${short(
+            characterStatistics.SPD,
           )}]`,
         },
       ]
@@ -38,7 +43,7 @@ const getCharacterCard = (character, withLevels, withGear, withItems) => {
         { text: `----------` },
         ...Object.keys(slots).map((key) => {
           if (character.gear[key]) {
-            const item = getItem(character, character.gear[key].name);
+            const item = getItem(character.gear[key]);
             return { text: `${key.padEnd(10, ' ')}: ${item.name}` };
           } else {
             return { text: `${key.padEnd(10, ' ')}: -----` };
@@ -53,9 +58,30 @@ const getCharacterCard = (character, withLevels, withGear, withItems) => {
         { text: `ITEMS` },
         { text: `----------` },
         ...character.inventory.map((f) => {
-          const item = getItem(character, f.name);
+          const item = getItem(f.itemId);
           return { text: `${item.name} x${f.amount}` };
         }),
+      ]
+    : [];
+
+  const titles = (character.defeatedRaces || []).find(
+    ({ amount }) => amount >= 10,
+  )
+    ? [
+        { text: ``, endDelimiter: '=' },
+        { text: `TITLES` },
+        { text: `----------` },
+        ...character.defeatedRaces
+          .filter(({ amount }) => amount >= 10)
+          .map(({ name, amount }) => {
+            const thresshold = [100000, 10000, 1000, 500, 100, 50, 10].find(
+              (s) => amount >= s,
+            );
+            const mastery = masteryThresholds[thresshold];
+            if (mastery) {
+              return { text: mastery.name(name) };
+            }
+          }),
       ]
     : [];
 
@@ -73,6 +99,7 @@ const getCharacterCard = (character, withLevels, withGear, withItems) => {
     ...levels,
     ...gear,
     ...items,
+    ...titles,
     { text: ``, endDelimiter: '~' },
   ];
   console.log();

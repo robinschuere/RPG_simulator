@@ -1,0 +1,6 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "csv-edit.readOption_delimiter": ";",
+  "csv-edit.readOption_hasHeader": "true"
+}

@@ -1,8 +1,15 @@
-const { attackTypes, statistics, fightStallTime } = require('../constants');
-const { elevateCharacterStatistics } = require('../helpers/characterHelpers');
+const {
+  attackTypes,
+  characterStatistics,
+  fightStallTime,
+  characterStages,
+} = require('../constants');
+const {
+  elevateCharacterStatistics,
+  addDefeatedRace,
+} = require('../helpers/characterHelpers');
 const { getCharacterStatistics } = require('../helpers/combatHelpers');
 const { getDamage } = require('../helpers/fightHelpers');
-const { getItem } = require('../helpers/itemHelpers');
 const { addDropToInventory } = require('../helpers/inventoryHelpers');
 const {
   arenaAnyMessage,
@@ -11,6 +18,7 @@ const {
   systemMessage,
 } = require('../helpers/messages');
 const staller = require('../helpers/staller');
+const { getItem } = require('../items');
 
 const defineFirstRound = (character, enemy) => {
   if (character.SPD === enemy.SPD) {
@@ -48,39 +56,47 @@ const getMoment = (v) =>
     v.MANA >= 0 ? v.MANA : 0
   }/${v.MAXMANA}`;
 
-const endFight = async (character, enemy, val) => {
-  const characterIsDead = val.characterAttack
-    ? val.attacker.HP <= 0
-    : val.defender.HP <= 0;
+const endFight = async (character, enemy, round, options) => {
+  const characterIsDead = round.characterAttack
+    ? round.attacker.HP <= 0
+    : round.defender.HP <= 0;
   if (characterIsDead) {
-    character.stage = 'death';
-    character.location = 'deathOffice';
+    character.stage = characterStages.death;
   } else {
-    character.HP = val.characterAttack ? val.attacker.HP : val.defender.HP;
+    character.HP = round.characterAttack
+      ? round.attacker.HP
+      : round.defender.HP;
     const drop = defineDrop(enemy);
-    const item = getItem(character, drop.name);
-    const name = val.characterAttack ? val.defender.name : val.attacker.name;
+    const name = round.characterAttack
+      ? round.defender.name
+      : round.attacker.name;
     const plural = drop.amount > 1 ? 's' : '';
-    addDropToInventory(character, drop);
-
+    addDropToInventory(character, drop.itemId, drop.amount);
+    const item = getItem(drop.itemId);
     console.log();
     arenaStatusMessage(`Hooray. You have defeated the ${name}!`);
     arenaStatusMessage(
       `The ${name} drops ${drop.amount} ${item.name}${plural}`,
     );
-    arenaStatusMessage(`You receive ${enemy.experience} experience ...`);
+    arenaStatusMessage(`You receive ${enemy.EXP} magical essence ...`);
+    addDefeatedRace(character, enemy.race);
+    console.log();
 
-    await elevateCharacterStatistics(character, [
-      { statName: statistics.EXP, value: enemy.experience },
-    ]);
+    await elevateCharacterStatistics(
+      character,
+      [{ statName: characterStatistics.EXP, value: enemy.EXP }],
+      options,
+    );
   }
 };
 
-const switchPlaces = (val) => {
-  if (parseInt(val.attacker.SPD / val.defender.SPD) > 2) {
+const switchPlaces = (round) => {
+  if (parseInt(round.attacker.SPD / round.defender.SPD) > 2) {
     arenaStatusMessage(
       `Because of an immence difference in speed, ${
-        val.characterAttack ? 'you can attack again' : 'you are attacked again.'
+        round.characterAttack
+          ? 'you can attack again'
+          : 'you are attacked again.'
       }`,
     );
     const randomizer = Math.floor(Math.random() * 100);
@@ -89,12 +105,12 @@ const switchPlaces = (val) => {
     }
   }
 
-  const oldAttacker = { ...val.attacker };
-  const oldDefender = { ...val.defender };
+  const oldAttacker = { ...round.attacker };
+  const oldDefender = { ...round.defender };
 
-  val.attacker = oldDefender;
-  val.defender = oldAttacker;
-  val.characterAttack = !val.characterAttack;
+  round.attacker = oldDefender;
+  round.defender = oldAttacker;
+  round.characterAttack = !round.characterAttack;
 };
 
 const getArenaStatus = (round) => {
@@ -106,20 +122,20 @@ const getArenaStatus = (round) => {
 };
 
 const runFight = async (character, enemy, options) => {
-  systemMessage(`You encounter a ${enemy.name}\n\n`);
+  systemMessage(`You encounter an ${enemy.name}\n\n`);
 
-  const characterValues = getCharacterStatistics(character);
-  const enemyValues = getCharacterStatistics(enemy);
+  const characterValues = getCharacterStatistics(character, enemy);
+  const enemyValues = getCharacterStatistics(enemy, character);
 
   const round = defineFirstRound(characterValues, enemyValues);
-  
+
   let sequence = true;
 
   const doNextAttack = async () => {
     await staller(options.stall || fightStallTime);
     const isFight = round.attacker.HP > 0 && round.defender.HP > 0;
     if (!isFight) {
-      await endFight(character, enemy, round);
+      await endFight(character, enemy, round, options);
       sequence = false;
       return;
     }
@@ -132,8 +148,8 @@ const runFight = async (character, enemy, options) => {
       console.clear();
       console.log();
       getArenaStatus(round);
-      console.log();
     }
+    console.log();
     switch (damage.type) {
       case attackTypes.dodged:
         arenaAnyMessage(

@@ -1,12 +1,13 @@
 const { characterStages } = require('../constants');
+const { getLocation } = require('../locations');
 
-const idle = {
-  name: 'the training grounds of the wizard tower',
+const idle = () => ({
+  ...getLocation('000002'),
   options: [
     {
       key: 'A',
       value: 'Enter the Wizard tower',
-      action: (character) => (character.location = 'wizardTower'),
+      action: (character) => (character.location = '000001'),
     },
     {
       key: 'B',
@@ -14,6 +15,6 @@ const idle = {
       action: (character) => (character.stage = characterStages.training),
     },
   ],
-};
+});
 
 module.exports = idle;

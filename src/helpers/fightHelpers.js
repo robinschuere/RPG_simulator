@@ -14,7 +14,7 @@ const avoid = (val) => {
 const dodged = (val) => {
   // dodgeChance is maxed at 30%;
   const randomizer = Math.floor(Math.random() * 100);
-  const chance = (100 - val.dodge) > 70;
+  const chance = 100 - val.dodge > 70;
   const dodgeChance = chance ? 100 - val.dodge : 70;
   return randomizer >= dodgeChance;
 };
@@ -88,17 +88,10 @@ const doAttack = (attacker, defender) => {
 };
 
 const getDamage = async (round, { auto = false }) => {
-  if (round.characterAttack && !round.auto) {
-    const options = auto
-      ? [...attack, { key: 'A', value: 'Auto-attack' }]
-      : attack;
-    const option = await optionAction('What do you do?', options);
-    
+  if (round.characterAttack && !auto) {
+    const option = await optionAction('What do you do?', attack);
+
     switch (option.key) {
-      case 'A':
-        round.auto = true;
-        systemMessage('You cannot intervene anymore in this fight.');
-        return doAttack(round.attacker, round.defender);
       case '2':
         return avoid(round.attacker)
           ? { type: attackTypes.avoided }

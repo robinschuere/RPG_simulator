@@ -3,5 +3,6 @@ module.exports = {
     introduction: 'introduction',
     idle: 'idle',
     training: 'training',
+    death: 'death',
   },
 };

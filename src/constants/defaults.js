@@ -24,7 +24,6 @@ module.exports = {
 
     gear: {},
     inventory: [],
-    defeatedRaces: [],
-    magicalProperties: [],
+    defeatedRaces: {},
   },
 };

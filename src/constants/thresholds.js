@@ -1,9 +1,9 @@
 module.exports = {
   masteryThresholds: {
-    10: { name: '[NAME] Tracker', STR: 5, INT: 5 },
-    50: { name: '[NAME] Hound', WIS: 5, DEF: 5 },
+    10: { name: (name) => `${name} Tracker`, STR: 5, INT: 5 },
+    50: { name: (name) => `${name} Hound`, WIS: 5, DEF: 5 },
     100: {
-      name: '[NAME] Impaler',
+      name: (name) => `${name} Impaler`,
       STR: 5,
       INT: 5,
       WIS: 5,
@@ -11,7 +11,7 @@ module.exports = {
       ACC: 5,
     },
     500: {
-      name: 'Adept Slayer of [NAME]',
+      name: (name) => `Adept Slayer of ${name}`,
       STR: 5,
       INT: 5,
       WIS: 5,
@@ -21,7 +21,7 @@ module.exports = {
       SPD: 5,
     },
     1000: {
-      name: 'Slayer of [NAME]s',
+      name: (name) => `Slayer of ${name}`,
       STR: 5,
       INT: 5,
       WIS: 5,
@@ -31,7 +31,7 @@ module.exports = {
       SPD: 5,
     },
     10000: {
-      name: 'Master Slayer of [NAME]s',
+      name: (name) => `Master Slayer of ${name}s`,
       STR: 5,
       INT: 5,
       WIS: 5,
@@ -41,7 +41,7 @@ module.exports = {
       SPD: 5,
     },
     100000: {
-      name: 'Grandmaster Slayer of [NAME]s',
+      name: (name) => `Grandmaster Slayer of ${name}s`,
       STR: 10,
       INT: 10,
       WIS: 10,

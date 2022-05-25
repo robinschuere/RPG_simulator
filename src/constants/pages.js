@@ -9,5 +9,6 @@ module.exports = {
   --no-clean-console, -c    this command is used to make the game display all messages
   --stall, -s               this command is used to set the stall message to 0.1 to make it seem that all messages are dropped immediatly,
   --auto, -a                this command is used to set the auto-attack option available
+  --raise, -r               this command is used to override the raise mechanic. handy for whenever you want to progress slightly faster
 `,
 };

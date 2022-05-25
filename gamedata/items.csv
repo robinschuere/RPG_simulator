@@ -1,0 +1,13 @@
+id;name;description;tier;slot;stackable;type;worth;ACC;HEA;STR;DEX;DEF;INT;WIS;SPD
+000001;Iron dagger;A dagger made from iron;1;RIGHTHAND;0;physical;1;4;0;2;0;0;0;0;0
+000002;Iron shortsword;A short sword made from iron;1;RIGHTHAND;0;physical;1;2;0;3;0;1;0;0;0
+000003;Coin;It's unedible, can't comfort the soul and does't provide heat. Yet, this whole world revolves around it...;0;UNKNOWN;1;UNKNOWN;1;;;;;;;;
+000004;Leather boots;Boots made from leather;1;FEET;0;physicalDefence;1;0;0;0;1;0;0;0;1
+000005;Leather pants;Pants made from leather;1;LEGS;0;physicalDefence;1;0;0;0;0;2;0;0;0
+000006;Tunic;A tunic made from soft wool;1;BODY;0;physicalDefence;1;0;0;0;0;2;0;0;0
+000007;Wooden club;Somehow, it seems like a small tree;1;RIGHTHAND;0;physical;1;3;0;3;0;0;0;0;0
+000008;Goblin shield;A goblin shield made out of crude wood and nails;1;LEFTHAND;0;physicalDefence;5;0;2;3;-3;5;0;0;0
+000009;Goblin spear;A small spear stained with blood ...;1;RIGHTHAND;0;physical;5;1;0;5;3;1;0;0;0
+000010;Goblin warspear;A crude spear tarnished with blood;2;RIGHTHAND;0;physical;15;5;0;10;3;3;0;0;0
+000011;Amulet of gold;An amulet made of gold;0;NECK;0;physicalDefence;25;0;0;0;0;0;0;0;0
+000012;Ring of gold;A ring made out of gold;0;RIGHTRING,LEFTRING;0;physicalDefence;25;0;0;0;0;0;0;0;0

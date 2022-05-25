@@ -1,16 +1,21 @@
 const { v4: uuid } = require('uuid');
 const { systemMessage } = require('./messages');
-const { options, statistics, characterDefaults } = require('../constants');
-const { optionAction, confirmAction } = require('./promptActions');
+const {
+  options: { statistics, race, gender },
+  characterStatistics,
+  characterDefaults,
+  raiseValue,
+} = require('../constants');
+const { optionAction, confirmAction, multiAction } = require('./promptActions');
 
 const getGenderLabel = (character) => {
-  const gender = options.gender.find((f) => f.key === character.gender);
-  return gender ? gender.value : 'UNKNOWN';
+  const value = gender.find((f) => f.key === character.gender);
+  return value ? value.value : 'UNKNOWN';
 };
 
 const getRaceLabel = (character) => {
-  const race = options.race.find((f) => f.key === character.race);
-  return race ? race.value : 'UNKNOWN';
+  const value = race.find((f) => f.key === character.race);
+  return value ? value.value : 'UNKNOWN';
 };
 
 const getMaxHealth = (character) => {
@@ -30,7 +35,7 @@ const raiseStatistic = (character, stat, value) => {
   return character;
 };
 
-const raiseLevel = async (character) => {
+const raiseLevel = async (character, options) => {
   const nextLvlExp = defineNextLevel(character);
   if (character.EXP >= nextLvlExp) {
     character.EXP -= nextLvlExp;
@@ -39,15 +44,23 @@ const raiseLevel = async (character) => {
     while (isRaising) {
       console.log();
       systemMessage(
-        'Congratulations. You have gained a level. You can now update 5 of your character characteristics.',
+        `Congratulations. You have gained a level. You can now update ${
+          options.raiseStatistics || raiseValue
+        } of your character characteristics.`,
       );
       console.log();
       const raisers = [];
-      for (let index = 0; index < 5; index++) {
-        const raise = await optionAction(
-          `Select a statistic upgrade.`,
-          options.statistics,
-        );
+      const values = await multiAction(
+        `Select a statistic upgrade.`,
+        statistics,
+        options.raiseStatistics || raiseValue,
+      );
+      for (
+        let index = 0;
+        index < (options.raiseStatistics || raiseValue);
+        index++
+      ) {
+        const raise = values[index];
         if (raisers.find((f) => f.key === raise.value)) {
           raisers.find((f) => f.key === raise.value).amount += 1;
         } else {
@@ -72,40 +85,50 @@ const raiseLevel = async (character) => {
   }
 };
 
-const elevateCharacter = async (character, stat, value) => {
+const elevateCharacter = async (character, stat, value, options) => {
   raiseStatistic(character, stat, value);
-  if (stat === statistics.HEA) {
+  if (stat === characterStatistics.HEA) {
     character.MAXHP = getMaxHealth(character);
     character.HP = getMaxHealth(character);
   }
-  if (stat === statistics.INT) {
+  if (stat === characterStatistics.INT) {
     character.MANA = getMaxMana(character);
     character.MAXMANA = getMaxMana(character);
   }
-  if (stat === statistics.WIS) {
+  if (stat === characterStatistics.WIS) {
     character.MAXHP = getMaxHealth(character);
   }
-  if (stat === statistics.DEF) {
+  if (stat === characterStatistics.DEF) {
     character.MAXHP = getMaxHealth(character);
   }
-  if (stat === statistics.EXP) {
+  if (stat === characterStatistics.EXP) {
     character.TOTALEXP += value;
-    await raiseLevel(character);
+    await raiseLevel(character, options);
   }
 };
 
-const elevateCharacterStatistics = async (character, values) => {
-  const EXPStatistic = values.find((s) => s.statName === statistics.EXP);
-  const otherStatistics = values.filter((s) => s.statName !== statistics.EXP);
+const elevateCharacterStatistics = async (character, values, options) => {
+  const EXPStatistic = values.find(
+    (s) => s.statName === characterStatistics.EXP,
+  );
+  const otherStatistics = values.filter(
+    (s) => s.statName !== characterStatistics.EXP,
+  );
 
   for (let index = 0; index < otherStatistics.length; index++) {
     await elevateCharacter(
       character,
       otherStatistics[index].statName,
       otherStatistics[index].value,
+      options,
     );
   }
-  await elevateCharacter(character, statistics.EXP, EXPStatistic.value);
+  await elevateCharacter(
+    character,
+    characterStatistics.EXP,
+    EXPStatistic.value,
+    options,
+  );
   return character;
 };
 

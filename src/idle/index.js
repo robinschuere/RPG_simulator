@@ -2,15 +2,18 @@ const { saveCharacter } = require('../helpers/fileHelpers');
 const { optionAction, quitAction } = require('../helpers/promptActions');
 const { getCharacterCard } = require('../helpers/textHelpers');
 
-const idleLocations = {
-  wizardTower: require('./wizardTower'),
-  wizardTowerGeneralStore: require('./wizardTowerGeneralStore'),
-  wizardTowerTrainingGrounds: require('./wizardTowerTrainingGrounds'),
-  mizgogOfficeDoor: require('./mizgogOfficeDoor'),
+const wizardTower = require('./wizardTower');
+const wizardTowerTrainingGrounds = require('./wizardTowerTrainingGrounds');
+
+const idleLocations = [];
+
+const loadIdleLocations = () => {
+  idleLocations.push(wizardTower());
+  idleLocations.push(wizardTowerTrainingGrounds());
 };
 
 const runIdle = async (character, stop, { doNotCleanConsole = false }) => {
-  const idle = idleLocations[character.location];
+  const idle = idleLocations.find((s) => s.id === character.location);
   if (!idle) {
     throw new Error(
       `This idle location ${character.location} is not written yet!`,
@@ -52,4 +55,5 @@ const runIdle = async (character, stop, { doNotCleanConsole = false }) => {
 
 module.exports = {
   runIdle,
+  loadIdleLocations,
 };
